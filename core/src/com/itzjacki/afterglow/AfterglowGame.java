@@ -1,33 +1,39 @@
 package com.itzjacki.afterglow;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.itzjacki.afterglow.controllers.EventManager;
+import com.itzjacki.afterglow.screens.MainMenuScreen;
+import com.itzjacki.afterglow.screens.PlayScreen;
 
-public class AfterglowGame extends ApplicationAdapter {
-	SpriteBatch batch;
-	Texture img;
-	
+import java.util.*;
+
+public class AfterglowGame extends Game {
+	public static final int V_WIDTH = 1920;
+	public static final int V_HEIGHT = 1080;
+
+	public SpriteBatch batch;
+	public static Map<String, Screen> screens;
+
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		img = new Texture("badlogic.jpg");
+
+		screens = new HashMap<String, Screen>();
+		screens.put("MainMenu", new MainMenuScreen());
+		screens.put("Play", new PlayScreen());
+
+		EventManager.getInstance().changeScreen("MainMenu");
 	}
 
 	@Override
 	public void render () {
-		Gdx.gl.glClearColor(1, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		batch.begin();
-		batch.draw(img, 0, 0);
-		batch.end();
+		super.render();
 	}
 	
 	@Override
 	public void dispose () {
 		batch.dispose();
-		img.dispose();
 	}
 }
