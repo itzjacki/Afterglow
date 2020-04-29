@@ -7,6 +7,10 @@ import com.itzjacki.afterglow.AfterglowGame;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		config.title = "Afterglow";
+		config.resizable = false;
+		config.width = 1600; // Default size before configured by user
+		config.height = 900;
 		new LwjglApplication(new AfterglowGame(), config);
 	}
 }
