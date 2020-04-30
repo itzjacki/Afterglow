@@ -2,6 +2,7 @@ package com.itzjacki.afterglow.controllers;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.itzjacki.afterglow.AfterglowGame;
 import com.itzjacki.afterglow.screens.OptionsScreen;
 
@@ -21,23 +22,23 @@ public class EventManager {
 
     // Uses the libgdx screen system to change the active screen
     public void changeScreen(String screenName){
-        ((Game) Gdx.app.getApplicationListener()).setScreen(AfterglowGame.screens.get(screenName));
+        Screen chosenScreen = AfterglowGame.screens.get(screenName);
+        if(chosenScreen == null){
+            throw new IllegalArgumentException("Tried to go to screen which doesn't exist: " + screenName);
+        }
+        ((Game) Gdx.app.getApplicationListener()).setScreen(chosenScreen);
         System.out.println("Changed to screen " + screenName); // for debugging
     }
 
     public void saveAndApplyPreferences(){
 
         // Resolution & fullscreen
-        //TODO: get input from list and save to variable here
         if(pom.isFullscreen()){
             Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
         }
         else{
             Gdx.graphics.setWindowedMode(pom.getScreenWidth(), pom.getScreenHeight());
         }
-
-        // Nickname
-
 
         // Sound effect volume
 

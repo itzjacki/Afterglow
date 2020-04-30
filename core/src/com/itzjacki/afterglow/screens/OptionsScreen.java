@@ -29,8 +29,8 @@ public class OptionsScreen implements Screen {
 
     public OptionsScreen(){
         stage = new Stage();
-        skin = new Skin(Gdx.files.internal("neon_skin/neon-ui.json")); //TODO: Change to single, shared skin - probably
-        batch = new SpriteBatch(); //TODO: Change this to a single game-wide spritebatch
+        skin = new Skin(Gdx.files.internal("neon_skin/neon-ui.json"));
+        batch = new SpriteBatch(); //TODO: Change this to a single game-wide sprite batch
         menuCamera = new OrthographicCamera();
         menuViewport = new FitViewport(AfterglowGame.V_WIDTH, AfterglowGame.V_HEIGHT, menuCamera);
 
@@ -155,6 +155,7 @@ public class OptionsScreen implements Screen {
 
     @Override
     public void hide() {
+        System.out.println("options hidden");
 
     }
 
