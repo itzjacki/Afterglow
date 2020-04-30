@@ -30,7 +30,7 @@ public class AfterglowGame extends Game {
 		screens.put("Play", new PlayScreen());
 		screens.put("Options", new OptionsScreen());
 
-		EventManager.getInstance().changeScreen("Options");
+		EventManager.getInstance().changeScreen("MainMenu");
 	}
 
 	@Override

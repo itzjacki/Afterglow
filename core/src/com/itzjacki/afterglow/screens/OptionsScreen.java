@@ -125,6 +125,7 @@ public class OptionsScreen implements Screen {
     @Override
     public void show() {
         update();
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
@@ -156,7 +157,7 @@ public class OptionsScreen implements Screen {
     @Override
     public void hide() {
         System.out.println("options hidden");
-
+        Gdx.input.setInputProcessor(null);
     }
 
     @Override

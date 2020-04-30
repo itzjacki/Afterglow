@@ -29,7 +29,7 @@ public class MainMenuScreen implements Screen {
         menuCamera = new OrthographicCamera();
         menuViewport = new FitViewport(AfterglowGame.V_WIDTH, AfterglowGame.V_HEIGHT, menuCamera);
 
-        Gdx.input.setInputProcessor(stage);
+
 
         menuTable = new Table(); // Table to hold menu items
         menuTable.setFillParent(true); // Sets the table to fill the entire window
@@ -41,14 +41,10 @@ public class MainMenuScreen implements Screen {
         final TextButton exitButton = new TextButton("Exit", skin, "default");
 
 
-        menuTable.add(titleLabel);
-        menuTable.row();
-        menuTable.add(playButton);
-        menuTable.row();
-        menuTable.add(optionsButton);
-        menuTable.row();
-        menuTable.add(highScoresButton);
-        menuTable.row();
+        menuTable.add(titleLabel).row();
+        menuTable.add(playButton).row();
+        menuTable.add(optionsButton).row();
+        menuTable.add(highScoresButton).row();
         menuTable.add(exitButton);
 
         stage.addActor(menuTable);
@@ -68,12 +64,12 @@ public class MainMenuScreen implements Screen {
             }
         });
 
-        highScoresButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                EventManager.getInstance().changeScreen("HighScores");
-            }
-        });
+//        highScoresButton.addListener(new ClickListener() {
+//            @Override
+//            public void clicked(InputEvent event, float x, float y) {
+//                EventManager.getInstance().changeScreen("HighScores");
+//            }
+//        });
 
         exitButton.addListener(new ClickListener() {
             @Override
@@ -85,7 +81,7 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void show() {
-
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
@@ -116,7 +112,7 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void hide() {
-
+        Gdx.input.setInputProcessor(null);
     }
 
     @Override
