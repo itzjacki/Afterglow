@@ -43,9 +43,9 @@ public class PlayerOptionManager {
     }
 
     // Saves nickname to config file. Nickname should be sanitized and assigned to variable before this is used.
-
-    protected void saveNickname(String nick){
-        prefs.putString(nick, "null");
+    protected void saveNickname(String newNickname){
+        setNickname(newNickname);
+        prefs.putString("nickname", newNickname);
         prefs.flush();
     }
 
@@ -86,7 +86,7 @@ public class PlayerOptionManager {
         return nickname;
     }
 
-    public void setNickname(String nickname) {
+    private void setNickname(String nickname) {
         this.nickname = nickname;
     }
 

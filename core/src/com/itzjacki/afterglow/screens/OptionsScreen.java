@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -14,6 +15,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.itzjacki.afterglow.AfterglowGame;
 import com.itzjacki.afterglow.controllers.EventManager;
+import com.itzjacki.afterglow.controllers.NicknameChangeDialog;
 
 public class OptionsScreen implements Screen {
 
@@ -89,19 +91,40 @@ public class OptionsScreen implements Screen {
         nicknameButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                //TODO: Create nickname dialog and add here
-                nicknameLabel.setText(makeNicknameLabelText());
+                Dialog nickDialog = new NicknameChangeDialog(skin);
+                nickDialog.show(stage);
+                update();
+            }
+        });
+
+        applyButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                System.out.println("From variable: " + EventManager.getInstance().getNickname());
+            }
+        });
+
+        backButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                EventManager.getInstance().changeScreen("MainMenu");
             }
         });
     }
 
+    // Generates text to display in nickname label with current nickname from player options
     private String makeNicknameLabelText(){
         return "Nickname: " + EventManager.getInstance().getNickname();
     }
 
+    // Updates all UI elements to match preferences
+    public void update(){
+        nicknameLabel.setText(makeNicknameLabelText());
+    }
+
     @Override
     public void show() {
-
+        update();
     }
 
     @Override

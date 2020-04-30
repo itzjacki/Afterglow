@@ -3,6 +3,7 @@ package com.itzjacki.afterglow.controllers;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.itzjacki.afterglow.AfterglowGame;
+import com.itzjacki.afterglow.screens.OptionsScreen;
 
 public class EventManager {
 
@@ -22,10 +23,6 @@ public class EventManager {
     public void changeScreen(String screenName){
         ((Game) Gdx.app.getApplicationListener()).setScreen(AfterglowGame.screens.get(screenName));
         System.out.println("Changed to screen " + screenName); // for debugging
-    }
-
-    public String getNickname(){
-        return pom.getNickname();
     }
 
     public void saveAndApplyPreferences(){
@@ -48,5 +45,15 @@ public class EventManager {
         // Music volume
 
         pom.saveAllToFile();
+    }
+
+    public String getNickname(){
+        return pom.getNickname();
+    }
+
+    // Saves nickname to POM, and updates the options screen by calling its show() method, which contains ui updaters
+    public void changeNickname(String newNickname){
+        pom.saveNickname(newNickname);
+        AfterglowGame.screens.get("Options").show();
     }
 }

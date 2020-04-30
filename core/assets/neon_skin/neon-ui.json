@@ -35,6 +35,12 @@ com.badlogic.gdx.graphics.Color: {
 		b: 1
 		a: 1
 	}
+	black: {
+		r: 0
+		g: 0
+		b: 0
+		a: 0.85
+	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable: {
 	button-c: {
@@ -212,6 +218,10 @@ com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable: {
 	progress-bar-big-knob-c: {
 		name: progress-bar-big-knob
 		color: color
+	}
+	black: {
+		name: white
+		color: black
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle: {
@@ -417,7 +427,7 @@ com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {
 	default: {
 		background: window-c
 		titleFont: font
-		titleFont: font
+		stageBackground: black
 	}
 }
 }
