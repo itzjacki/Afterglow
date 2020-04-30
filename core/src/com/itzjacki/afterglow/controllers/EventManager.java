@@ -24,6 +24,10 @@ public class EventManager {
         System.out.println("Changed to screen " + screenName); // for debugging
     }
 
+    public String getNickname(){
+        return pom.getNickname();
+    }
+
     public void saveAndApplyPreferences(){
 
         // Resolution & fullscreen

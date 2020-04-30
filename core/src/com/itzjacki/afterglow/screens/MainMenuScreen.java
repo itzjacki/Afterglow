@@ -3,7 +3,6 @@ package com.itzjacki.afterglow.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -22,7 +21,7 @@ public class MainMenuScreen implements Screen {
     public MainMenuScreen(){
         skin = new Skin(Gdx.files.internal("neon_skin/neon-ui.json"));
         stage = new Stage();
-        batch = new SpriteBatch();
+        batch = new SpriteBatch(); //TODO: Change this to a single game-wide spritebatch
         menuCamera = new OrthographicCamera();
         menuViewport = new FitViewport(AfterglowGame.V_WIDTH, AfterglowGame.V_HEIGHT, menuCamera);
 
@@ -30,15 +29,17 @@ public class MainMenuScreen implements Screen {
 
         table = new Table();
         table.setFillParent(true); // Sets the table to fill the entire window
-        table.top();
 
         table.setDebug(true); // for debugging
 
+        final Label titleLabel = new Label("Afterglow", skin); //TODO: Change to game logo
         final TextButton playButton = new TextButton("Play", skin, "default");
         final TextButton optionsButton = new TextButton("Options", skin, "default");
         final TextButton highScoresButton = new TextButton("High scores", skin, "default");
         final TextButton exitButton = new TextButton("Exit", skin, "default");
 
+        table.add(titleLabel);
+        table.row();
         table.add(playButton);
         table.row();
         table.add(optionsButton);
@@ -48,18 +49,6 @@ public class MainMenuScreen implements Screen {
         table.add(exitButton);
 
         stage.addActor(table);
-
-//        Label nameLabel = new Label("Name:", skin);
-//        TextField nameText = new TextField("", skin);
-//        Label addressLabel = new Label("Address:", skin);
-//        TextField addressText = new TextField("", skin);
-//
-//        Table table = new Table();
-//        table.add(nameLabel);
-//        table.add(nameText).width(100);
-//        table.row();
-//        table.add(addressLabel);
-//        table.add(addressText).width(100);
     }
 
     @Override
@@ -73,6 +62,7 @@ public class MainMenuScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
+        stage.act();
         stage.draw();
         batch.end();
     }
