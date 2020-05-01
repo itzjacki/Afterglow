@@ -6,10 +6,12 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -28,11 +30,11 @@ public class OptionsScreen implements Screen {
     private Label nicknameLabel;
 
     public OptionsScreen(){
-        stage = new Stage();
         skin = new Skin(Gdx.files.internal("neon_skin/neon-ui.json"));
         batch = new SpriteBatch(); //TODO: Change this to a single game-wide sprite batch
         menuCamera = new OrthographicCamera();
-        menuViewport = new FitViewport(AfterglowGame.V_WIDTH, AfterglowGame.V_HEIGHT, menuCamera);
+        menuViewport = new FitViewport(EventManager.getInstance().getScreenWidth(), EventManager.getInstance().getScreenHeight(), menuCamera);
+        stage = new Stage(menuViewport);
 
         Gdx.input.setInputProcessor(stage);
 
@@ -45,7 +47,7 @@ public class OptionsScreen implements Screen {
 
         final Label resolutionLabel = new Label("Resolution:", skin);
         final SelectBox<String> resolutionBox = new SelectBox<String>(skin);
-        resolutionBox.setItems("1024x576", "1280x720", "1366x768", "1600x900", "1920x1080", "2560x1440");
+        resolutionBox.setItems(AfterglowGame.resolutions);
         final CheckBox fullscreenCheckbox = new CheckBox("Fullscreen", skin);
 
         final Label audioOptionsLabel = new Label("Audio options", skin);
@@ -88,6 +90,14 @@ public class OptionsScreen implements Screen {
         stage.addActor(menuTable);
 
         // Adds listeners to UI
+
+        resolutionBox.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                EventManager.getInstance().changeResolution(resolutionBox.getSelected());
+            }
+        });
+
         nicknameButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -100,7 +110,7 @@ public class OptionsScreen implements Screen {
         applyButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                System.out.println("From variable: " + EventManager.getInstance().getNickname());
+                EventManager.getInstance().saveAndApplyPreferences();
             }
         });
 
@@ -117,13 +127,15 @@ public class OptionsScreen implements Screen {
         return "Nickname: " + EventManager.getInstance().getNickname();
     }
 
-    // Updates all UI elements to match preferences
+    // Updates all UI elements to match preferences after pulling data from preferences
     public void update(){
+
         nicknameLabel.setText(makeNicknameLabelText());
     }
 
     @Override
     public void show() {
+        EventManager.getInstance().loadPreferencesFromFile();
         update();
         Gdx.input.setInputProcessor(stage);
     }
@@ -133,6 +145,9 @@ public class OptionsScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        batch.setTransformMatrix(menuCamera.view);
+        batch.setProjectionMatrix(menuCamera.projection);
+
         batch.begin();
         stage.act();
         stage.draw();
@@ -141,7 +156,10 @@ public class OptionsScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-
+        menuViewport.update(width, height);
+        menuCamera.update();
+        //TODO: Debug
+//        EventManager.getInstance().reloadGame();
     }
 
     @Override
@@ -156,7 +174,6 @@ public class OptionsScreen implements Screen {
 
     @Override
     public void hide() {
-        System.out.println("options hidden");
         Gdx.input.setInputProcessor(null);
     }
 

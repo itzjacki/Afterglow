@@ -19,7 +19,7 @@ public class PlayScreen implements Screen {
     public PlayScreen() {
         texture = new Texture("badlogic.jpg");
         gameCamera = new OrthographicCamera();
-        gameViewport = new FitViewport(AfterglowGame.V_WIDTH, AfterglowGame.V_HEIGHT, gameCamera);
+        gameViewport = new FitViewport(AfterglowGame.ACTIVE_PLAY_WIDTH, AfterglowGame.ACTIVE_PLAY_HEIGHT, gameCamera);
 
     }
 

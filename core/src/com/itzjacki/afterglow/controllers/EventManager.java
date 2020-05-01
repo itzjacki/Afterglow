@@ -3,8 +3,11 @@ package com.itzjacki.afterglow.controllers;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.math.Interpolation;
 import com.itzjacki.afterglow.AfterglowGame;
+import com.itzjacki.afterglow.screens.MainMenuScreen;
 import com.itzjacki.afterglow.screens.OptionsScreen;
+import com.itzjacki.afterglow.screens.PlayScreen;
 
 public class EventManager {
 
@@ -20,25 +23,26 @@ public class EventManager {
         return INSTANCE;
     }
 
-    // Uses the libgdx screen system to change the active screen
+    // Uses the LibGDX screen system to change the active screen
     public void changeScreen(String screenName){
-        Screen chosenScreen = AfterglowGame.screens.get(screenName);
-        if(chosenScreen == null){
-            throw new IllegalArgumentException("Tried to go to screen which doesn't exist: " + screenName);
+        if(screenName == "Loading"){
+            ((Game) Gdx.app.getApplicationListener()).setScreen(AfterglowGame.loadingScreen);
         }
-        ((Game) Gdx.app.getApplicationListener()).setScreen(chosenScreen);
-        System.out.println("Changed to screen " + screenName); // for debugging
+        else {
+            Screen chosenScreen = AfterglowGame.screens.get(screenName);
+            if (chosenScreen == null) {
+                System.out.println("Tried to go to screen which doesn't exist: " + screenName); // To be used during development. Less severe.
+                // throw new IllegalArgumentException("Tried to go to screen which doesn't exist: " + screenName);
+            }
+            ((Game) Gdx.app.getApplicationListener()).setScreen(chosenScreen);
+            System.out.println("Changed to screen: " + screenName); // for debugging
+        }
     }
 
     public void saveAndApplyPreferences(){
 
         // Resolution & fullscreen
-        if(pom.isFullscreen()){
-            Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
-        }
-        else{
-            Gdx.graphics.setWindowedMode(pom.getScreenWidth(), pom.getScreenHeight());
-        }
+        applyResolution();
 
         // Sound effect volume
 
@@ -56,5 +60,45 @@ public class EventManager {
     public void changeNickname(String newNickname){
         pom.saveNickname(newNickname);
         AfterglowGame.screens.get("Options").show();
+    }
+
+    public void changeResolution(String resolutionString){
+        String[] trimmedString = resolutionString.split("x");
+        int resolutionWidth = Integer.parseInt(trimmedString[0]);
+        int resolutionHeight = Integer.parseInt(trimmedString[1]);
+        pom.setScreenWidth(resolutionWidth);
+        pom.setScreenHeight(resolutionHeight);
+    }
+
+    // Applies resolution stored in pom variables. Runs on resolution change and on game start.
+    public void applyResolution(){
+        if(pom.isFullscreen()){
+            Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+        }
+        else{
+            Gdx.graphics.setWindowedMode(pom.getScreenWidth(), pom.getScreenHeight());
+        }
+    }
+
+    // Makes POM pull data from preferences into current variables
+    public void loadPreferencesFromFile(){
+        pom.loadAllFromFile();
+    }
+
+    public int getScreenWidth(){
+        return pom.getScreenWidth();
+    }
+
+    public int getScreenHeight(){
+        return pom.getScreenHeight();
+    }
+
+    // Can be used to reload the game to adapt UI to new resolution.
+    public void reloadGame(){
+        changeScreen("Loading");
+
+        AfterglowGame.createScreens();
+
+        changeScreen("Options");
     }
 }

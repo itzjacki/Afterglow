@@ -9,8 +9,8 @@ public class DesktopLauncher {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.title = "Afterglow";
 		config.resizable = false;
-		config.width = 1600; // Default size before configured by user
-		config.height = 900;
+		config.width = 1280; // Default size before configured by user
+		config.height = 720;
 		new LwjglApplication(new AfterglowGame(), config);
 	}
 }

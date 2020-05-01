@@ -23,11 +23,11 @@ public class MainMenuScreen implements Screen {
     private Viewport menuViewport;
 
     public MainMenuScreen(){
-        stage = new Stage();
         skin = new Skin(Gdx.files.internal("neon_skin/neon-ui.json"));
         batch = new SpriteBatch(); //TODO: Change this to a single game-wide sprite batch
         menuCamera = new OrthographicCamera();
-        menuViewport = new FitViewport(AfterglowGame.V_WIDTH, AfterglowGame.V_HEIGHT, menuCamera);
+        menuViewport = new FitViewport(EventManager.getInstance().getScreenWidth(), EventManager.getInstance().getScreenHeight());
+        stage = new Stage(menuViewport);
 
 
 
@@ -64,12 +64,12 @@ public class MainMenuScreen implements Screen {
             }
         });
 
-//        highScoresButton.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-//                EventManager.getInstance().changeScreen("HighScores");
-//            }
-//        });
+        highScoresButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                EventManager.getInstance().changeScreen("HighScores");
+            }
+        });
 
         exitButton.addListener(new ClickListener() {
             @Override
@@ -89,6 +89,9 @@ public class MainMenuScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        batch.setTransformMatrix(menuCamera.view);
+        batch.setProjectionMatrix(menuCamera.projection);
+
         batch.begin();
         stage.act();
         stage.draw();
@@ -97,7 +100,8 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-//        menuViewport.update(width, height);
+        menuViewport.update(width, height);
+        menuCamera.update();
     }
 
     @Override

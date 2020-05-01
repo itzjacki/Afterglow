@@ -6,6 +6,7 @@ import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.itzjacki.afterglow.controllers.EventManager;
+import com.itzjacki.afterglow.screens.LoadingScreen;
 import com.itzjacki.afterglow.screens.MainMenuScreen;
 import com.itzjacki.afterglow.screens.OptionsScreen;
 import com.itzjacki.afterglow.screens.PlayScreen;
@@ -15,21 +16,23 @@ import java.util.Map;
 
 
 public class AfterglowGame extends Game {
-	public static final int V_WIDTH = 1920;
-	public static final int V_HEIGHT = 1080;
+	// Active play refers to the area where actual projectiles exist. Should be constant across resolutions for balance.
+	public static final int ACTIVE_PLAY_WIDTH = 1920;
+	public static final int ACTIVE_PLAY_HEIGHT = 1080;
+	public static final String[] resolutions = new String[]{"1024x576", "1280x720", "1366x768", "1600x900", "1920x1080", "2560x1440"};
 
 	public SpriteBatch batch;
 	public static Map<String, Screen> screens;
+	public static final Screen loadingScreen = new LoadingScreen();
 
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
 
 		screens = new HashMap<String, Screen>();
-		screens.put("MainMenu", new MainMenuScreen());
-		screens.put("Play", new PlayScreen());
-		screens.put("Options", new OptionsScreen());
+		createScreens();
 
+		EventManager.getInstance().applyResolution();
 		EventManager.getInstance().changeScreen("MainMenu");
 	}
 
@@ -41,5 +44,11 @@ public class AfterglowGame extends Game {
 	@Override
 	public void dispose () {
 		batch.dispose();
+	}
+
+	public static void createScreens(){
+		screens.put("MainMenu", new MainMenuScreen());
+		screens.put("Options", new OptionsScreen());
+		screens.put("Play", new PlayScreen());
 	}
 }
