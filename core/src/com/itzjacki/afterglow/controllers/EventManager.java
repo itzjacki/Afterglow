@@ -42,7 +42,12 @@ public class EventManager {
     public void saveAndApplyPreferences(){
 
         // Resolution & fullscreen
-        applyResolution();
+        if(Gdx.graphics.getWidth() != pom.getScreenWidth() || Gdx.graphics.getHeight() != pom.getScreenHeight()){
+            applyResolution();
+        }
+        else{
+            System.out.println("did not change resolution, as it was already on the target resolution.");
+        }
 
         // Sound effect volume
 
@@ -78,6 +83,7 @@ public class EventManager {
         else{
             Gdx.graphics.setWindowedMode(pom.getScreenWidth(), pom.getScreenHeight());
         }
+        reloadGame();
     }
 
     // Makes POM pull data from preferences into current variables

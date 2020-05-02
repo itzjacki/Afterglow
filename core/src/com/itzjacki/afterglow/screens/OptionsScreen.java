@@ -158,8 +158,6 @@ public class OptionsScreen implements Screen {
     public void resize(int width, int height) {
         menuViewport.update(width, height);
         menuCamera.update();
-        //TODO: Debug
-//        EventManager.getInstance().reloadGame();
     }
 
     @Override

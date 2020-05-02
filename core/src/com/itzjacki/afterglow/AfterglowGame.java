@@ -23,13 +23,14 @@ public class AfterglowGame extends Game {
 
 	public SpriteBatch batch;
 	public static Map<String, Screen> screens;
-	public static final Screen loadingScreen = new LoadingScreen();
+	public static Screen loadingScreen;
 
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
 
 		screens = new HashMap<String, Screen>();
+		loadingScreen = new LoadingScreen();
 		createScreens();
 
 		EventManager.getInstance().applyResolution();
@@ -40,7 +41,7 @@ public class AfterglowGame extends Game {
 	public void render () {
 		super.render();
 	}
-	
+
 	@Override
 	public void dispose () {
 		batch.dispose();
