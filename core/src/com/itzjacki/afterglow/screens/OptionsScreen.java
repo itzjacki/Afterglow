@@ -29,6 +29,8 @@ public class OptionsScreen implements Screen {
     private final Label nicknameLabel;
     private final SelectBox<String> resolutionBox;
     private final CheckBox fullscreenCheckbox;
+    private final Slider audioEffectSlider;
+    private final Slider musicSlider;
 
     public OptionsScreen(){
         skin = new Skin(Gdx.files.internal("neon_skin/neon-ui.json"));
@@ -53,9 +55,9 @@ public class OptionsScreen implements Screen {
 
         final Label audioOptionsLabel = new Label("Audio options", skin);
         final Label audioEffectLabel = new Label("Effect volume:", skin);
-        final Slider audioEffectSlider = new Slider(0f, 1f, 0.01f, false, skin);
+        audioEffectSlider = new Slider(0f, 1f, 0.01f, false, skin);
         final Label musicLabel = new Label("Music volume:", skin);
-        final Slider musicSlider = new Slider(0f, 1f, 0.01f, false, skin);
+        musicSlider = new Slider(0f, 1f, 0.01f, false, skin);
 
         nicknameLabel = new Label(makeNicknameLabelText(), skin);
         final TextButton nicknameButton = new TextButton("Change nickname", skin, "default");
@@ -106,6 +108,20 @@ public class OptionsScreen implements Screen {
             }
         });
 
+        musicSlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                EventManager.getInstance().selectMusicVolume(musicSlider.getValue());
+            }
+        });
+
+        audioEffectSlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                EventManager.getInstance().selectEffectVolume(audioEffectSlider.getValue());
+            }
+        });
+
         nicknameButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -139,8 +155,12 @@ public class OptionsScreen implements Screen {
     public void update(){
         // Selects current resolution in dropdown list
         resolutionBox.setSelected("" + EventManager.getInstance().getScreenWidth() + "x" + EventManager.getInstance().getScreenHeight());
-
         fullscreenCheckbox.setChecked(EventManager.getInstance().isFullscreen());
+
+        // Sets both audio sliders to correct value
+        musicSlider.setValue(EventManager.getInstance().getMusicVolume());
+        audioEffectSlider.setValue(EventManager.getInstance().getEffectVolume());
+
         // Ensures nickname displayed is current
         nicknameLabel.setText(makeNicknameLabelText());
     }

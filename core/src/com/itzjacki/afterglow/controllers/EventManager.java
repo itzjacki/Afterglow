@@ -126,4 +126,20 @@ public class EventManager {
 
         changeScreen("Options");
     }
+
+    public void selectMusicVolume(float volume){
+        pom.setMusicLevel(volume);
+    }
+
+    public void selectEffectVolume(float volume){
+        pom.setAudioEffectLevel(volume);
+    }
+
+    public float getMusicVolume(){
+        return pom.getMusicLevel();
+    }
+
+    public float getEffectVolume(){
+        return pom.getAudioEffectLevel();
+    }
 }
