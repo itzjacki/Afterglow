@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -27,7 +26,8 @@ public class OptionsScreen implements Screen {
     private SpriteBatch batch;
     private Camera menuCamera;
     private Viewport menuViewport;
-    private Label nicknameLabel;
+    private final Label nicknameLabel;
+    private final SelectBox<String> resolutionBox;
 
     public OptionsScreen(){
         skin = new Skin(Gdx.files.internal("neon_skin/neon-ui.json"));
@@ -46,7 +46,7 @@ public class OptionsScreen implements Screen {
         final Label blankRow = new Label("", skin);
 
         final Label resolutionLabel = new Label("Resolution:", skin);
-        final SelectBox<String> resolutionBox = new SelectBox<String>(skin);
+        resolutionBox = new SelectBox<String>(skin);
         resolutionBox.setItems(AfterglowGame.resolutions);
         final CheckBox fullscreenCheckbox = new CheckBox("Fullscreen", skin);
 
@@ -94,7 +94,7 @@ public class OptionsScreen implements Screen {
         resolutionBox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                EventManager.getInstance().changeResolution(resolutionBox.getSelected());
+                EventManager.getInstance().selectResolution(resolutionBox.getSelected());
             }
         });
 
@@ -129,7 +129,8 @@ public class OptionsScreen implements Screen {
 
     // Updates all UI elements to match preferences after pulling data from preferences
     public void update(){
-
+        resolutionBox.setSelected("" + EventManager.getInstance().getScreenWidth() + "x" + EventManager.getInstance().getScreenHeight());
+        System.out.println("Set selected resolution to " + EventManager.getInstance().getScreenWidth() + "x" + EventManager.getInstance().getScreenHeight());
         nicknameLabel.setText(makeNicknameLabelText());
     }
 

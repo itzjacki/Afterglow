@@ -42,12 +42,7 @@ public class EventManager {
     public void saveAndApplyPreferences(){
 
         // Resolution & fullscreen
-        if(Gdx.graphics.getWidth() != pom.getScreenWidth() || Gdx.graphics.getHeight() != pom.getScreenHeight()){
-            applyResolution();
-        }
-        else{
-            System.out.println("did not change resolution, as it was already on the target resolution.");
-        }
+        boolean resolutionChanged = applyResolution(getScreenWidth(), getScreenHeight());
 
         // Sound effect volume
 
@@ -55,6 +50,10 @@ public class EventManager {
         // Music volume
 
         pom.saveAllToFile();
+        // Reloads the game after the values are saved, so it doesn't overwrite them before they're saved
+        if(resolutionChanged){
+            reloadGame();
+        }
     }
 
     public String getNickname(){
@@ -67,7 +66,8 @@ public class EventManager {
         AfterglowGame.screens.get("Options").show();
     }
 
-    public void changeResolution(String resolutionString){
+    // Called when user selects new resolution in drop-down menu. Doesn't actually apply resolution, just saves current choice to pom variable.
+    public void selectResolution(String resolutionString){
         String[] trimmedString = resolutionString.split("x");
         int resolutionWidth = Integer.parseInt(trimmedString[0]);
         int resolutionHeight = Integer.parseInt(trimmedString[1]);
@@ -76,14 +76,21 @@ public class EventManager {
     }
 
     // Applies resolution stored in pom variables. Runs on resolution change and on game start.
-    public void applyResolution(){
-        if(pom.isFullscreen()){
-            Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+    // Returns bool on whether resolution was actually changed.
+    public boolean applyResolution(int newWidth, int newHeight){
+        // Only changes resolution if the given resolution is actually different from the current one.
+        if(Gdx.graphics.getWidth() != newWidth || Gdx.graphics.getHeight() != newHeight){
+            if(pom.isFullscreen()){
+                Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+            }
+            else{
+                Gdx.graphics.setWindowedMode(newWidth, newHeight);
+            }
+            return true;
         }
         else{
-            Gdx.graphics.setWindowedMode(pom.getScreenWidth(), pom.getScreenHeight());
+            return false;
         }
-        reloadGame();
     }
 
     // Makes POM pull data from preferences into current variables

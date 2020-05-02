@@ -33,7 +33,7 @@ public class AfterglowGame extends Game {
 		loadingScreen = new LoadingScreen();
 		createScreens();
 
-		EventManager.getInstance().applyResolution();
+		EventManager.getInstance().applyResolution(EventManager.getInstance().getScreenWidth(), EventManager.getInstance().getScreenHeight());
 		EventManager.getInstance().changeScreen("MainMenu");
 	}
 
