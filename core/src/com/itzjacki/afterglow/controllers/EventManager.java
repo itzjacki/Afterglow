@@ -3,17 +3,15 @@ package com.itzjacki.afterglow.controllers;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.math.Interpolation;
 import com.itzjacki.afterglow.AfterglowGame;
-import com.itzjacki.afterglow.screens.MainMenuScreen;
-import com.itzjacki.afterglow.screens.OptionsScreen;
-import com.itzjacki.afterglow.screens.PlayScreen;
 
 public class EventManager {
 
     // EventManager is a singleton
     private static final EventManager INSTANCE = new EventManager();
     private PlayerOptionManager pom;
+    // im will hold the currently active instance manager when a song is being played.
+    private InstanceManager im;
 
     private EventManager(){
         pom = new PlayerOptionManager();
@@ -25,7 +23,7 @@ public class EventManager {
 
     // Uses the LibGDX screen system to change the active screen
     public void changeScreen(String screenName){
-        if(screenName == "Loading"){
+        if(screenName.equals("Loading")){
             ((Game) Gdx.app.getApplicationListener()).setScreen(AfterglowGame.loadingScreen);
         }
         else {

@@ -32,7 +32,10 @@ public class AfterglowGame extends Game {
 		batch = new SpriteBatch();
 
 		screens = new HashMap<String, Screen>();
+
+		// LoadingScreen is a super bare-bones "placeholder" screen the player is sent to when other screens need to refresh, for example.
 		loadingScreen = new LoadingScreen();
+
 		createScreens();
 
 		EventManager.getInstance().applyResolution(EventManager.getInstance().getScreenWidth(), EventManager.getInstance().getScreenHeight());
@@ -52,9 +55,9 @@ public class AfterglowGame extends Game {
 		batch.dispose();
 	}
 
+	// Creates the screens which only need to be created once, but need to be updated when a resolution change happens.
 	public static void createScreens(){
 		screens.put("MainMenu", new MainMenuScreen());
 		screens.put("Options", new OptionsScreen());
-		screens.put("Play", new PlayScreen());
 	}
 }

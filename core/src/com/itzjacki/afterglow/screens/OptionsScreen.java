@@ -16,7 +16,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.itzjacki.afterglow.AfterglowGame;
 import com.itzjacki.afterglow.controllers.EventManager;
-import com.itzjacki.afterglow.controllers.NicknameChangeDialog;
+import com.itzjacki.afterglow.models.NicknameChangeDialog;
 
 public class OptionsScreen implements Screen {
 
