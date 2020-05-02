@@ -28,6 +28,7 @@ public class OptionsScreen implements Screen {
     private Viewport menuViewport;
     private final Label nicknameLabel;
     private final SelectBox<String> resolutionBox;
+    private final CheckBox fullscreenCheckbox;
 
     public OptionsScreen(){
         skin = new Skin(Gdx.files.internal("neon_skin/neon-ui.json"));
@@ -48,7 +49,7 @@ public class OptionsScreen implements Screen {
         final Label resolutionLabel = new Label("Resolution:", skin);
         resolutionBox = new SelectBox<String>(skin);
         resolutionBox.setItems(AfterglowGame.resolutions);
-        final CheckBox fullscreenCheckbox = new CheckBox("Fullscreen", skin);
+        fullscreenCheckbox = new CheckBox("Fullscreen", skin);
 
         final Label audioOptionsLabel = new Label("Audio options", skin);
         final Label audioEffectLabel = new Label("Effect volume:", skin);
@@ -98,6 +99,13 @@ public class OptionsScreen implements Screen {
             }
         });
 
+        fullscreenCheckbox.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                EventManager.getInstance().selectFullscreen(fullscreenCheckbox.isChecked());
+            }
+        });
+
         nicknameButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -129,8 +137,11 @@ public class OptionsScreen implements Screen {
 
     // Updates all UI elements to match preferences after pulling data from preferences
     public void update(){
+        // Selects current resolution in dropdown list
         resolutionBox.setSelected("" + EventManager.getInstance().getScreenWidth() + "x" + EventManager.getInstance().getScreenHeight());
-        System.out.println("Set selected resolution to " + EventManager.getInstance().getScreenWidth() + "x" + EventManager.getInstance().getScreenHeight());
+
+        fullscreenCheckbox.setChecked(EventManager.getInstance().isFullscreen());
+        // Ensures nickname displayed is current
         nicknameLabel.setText(makeNicknameLabelText());
     }
 

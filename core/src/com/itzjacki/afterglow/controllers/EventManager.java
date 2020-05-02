@@ -75,11 +75,19 @@ public class EventManager {
         pom.setScreenHeight(resolutionHeight);
     }
 
+    public void selectFullscreen(boolean fullscreen){
+        pom.setFullscreen(fullscreen);
+    }
+
     // Applies resolution stored in pom variables. Runs on resolution change and on game start.
     // Returns bool on whether resolution was actually changed.
     public boolean applyResolution(int newWidth, int newHeight){
         // Only changes resolution if the given resolution is actually different from the current one.
-        if(Gdx.graphics.getWidth() != newWidth || Gdx.graphics.getHeight() != newHeight){
+        if( AfterglowGame.CURRENT_RESOLUTION_WIDTH != newWidth || AfterglowGame.CURRENT_RESOLUTION_HEIGHT != newHeight || Gdx.graphics.isFullscreen() != pom.isFullscreen()){
+
+            AfterglowGame.CURRENT_RESOLUTION_WIDTH = newWidth;
+            AfterglowGame.CURRENT_RESOLUTION_HEIGHT = newHeight;
+
             if(pom.isFullscreen()){
                 Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
             }
@@ -104,6 +112,10 @@ public class EventManager {
 
     public int getScreenHeight(){
         return pom.getScreenHeight();
+    }
+
+    public boolean isFullscreen(){
+        return pom.isFullscreen();
     }
 
     // Can be used to reload the game to adapt UI to new resolution.
