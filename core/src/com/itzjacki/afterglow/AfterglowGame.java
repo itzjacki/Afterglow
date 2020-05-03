@@ -2,7 +2,6 @@ package com.itzjacki.afterglow;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.itzjacki.afterglow.controllers.EventManager;
@@ -10,7 +9,6 @@ import com.itzjacki.afterglow.models.Song;
 import com.itzjacki.afterglow.screens.LoadingScreen;
 import com.itzjacki.afterglow.screens.MainMenuScreen;
 import com.itzjacki.afterglow.screens.OptionsScreen;
-import com.itzjacki.afterglow.screens.PlayScreen;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,7 +37,7 @@ public class AfterglowGame extends Game {
 		// LoadingScreen is a super bare-bones "placeholder" screen the player is sent to when other screens need to refresh, for example.
 		loadingScreen = new LoadingScreen();
 
-		screens = new HashMap<String, Screen>();
+		screens = new HashMap<>();
 		createScreens();
 
 		songs = new ArrayList<>();
