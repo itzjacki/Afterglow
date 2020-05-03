@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.itzjacki.afterglow.AfterglowGame;
+import com.itzjacki.afterglow.models.Song;
 
 public class EventManager {
 
@@ -11,7 +12,7 @@ public class EventManager {
     private static final EventManager INSTANCE = new EventManager();
     private PlayerOptionManager pom;
     // im will hold the currently active instance manager when a song is being played.
-    private InstanceManager im;
+    private SongInstanceManager sim;
 
     private EventManager(){
         pom = new PlayerOptionManager();
@@ -21,10 +22,11 @@ public class EventManager {
         return INSTANCE;
     }
 
-    // Uses the LibGDX screen system to change the active screen
+    // Finds screen among the game's default screens
     public void changeScreen(String screenName){
         if(screenName.equals("Loading")){
-            ((Game) Gdx.app.getApplicationListener()).setScreen(AfterglowGame.loadingScreen);
+            changeScreen(AfterglowGame.loadingScreen);
+            System.out.println("Changed to loading screen");
         }
         else {
             Screen chosenScreen = AfterglowGame.screens.get(screenName);
@@ -32,9 +34,18 @@ public class EventManager {
                 System.out.println("Tried to go to screen which doesn't exist: " + screenName); // To be used during development. Less severe.
                 // throw new IllegalArgumentException("Tried to go to screen which doesn't exist: " + screenName);
             }
-            ((Game) Gdx.app.getApplicationListener()).setScreen(chosenScreen);
+            changeScreen(chosenScreen);
             System.out.println("Changed to screen: " + screenName); // for debugging
         }
+    }
+    // Changes to screen explicitly passed in parameter
+    public void changeScreen(Screen screen){
+        ((Game) Gdx.app.getApplicationListener()).setScreen(screen);
+    }
+
+    public void createSongInstance(Song song){
+        sim = new SongInstanceManager(song);
+        changeScreen(sim.getScreen());
     }
 
     public void saveAndApplyPreferences(){

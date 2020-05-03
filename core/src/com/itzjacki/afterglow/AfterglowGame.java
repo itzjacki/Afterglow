@@ -6,11 +6,13 @@ import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.itzjacki.afterglow.controllers.EventManager;
+import com.itzjacki.afterglow.models.Song;
 import com.itzjacki.afterglow.screens.LoadingScreen;
 import com.itzjacki.afterglow.screens.MainMenuScreen;
 import com.itzjacki.afterglow.screens.OptionsScreen;
 import com.itzjacki.afterglow.screens.PlayScreen;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,17 +28,22 @@ public class AfterglowGame extends Game {
 	public SpriteBatch batch;
 	public static Map<String, Screen> screens;
 	public static Screen loadingScreen;
+	public static ArrayList<Song> songs;
 
 	@Override
 	public void create () {
-		batch = new SpriteBatch();
+		// A bunch of initialization stuff happens here
 
-		screens = new HashMap<String, Screen>();
+		batch = new SpriteBatch();
 
 		// LoadingScreen is a super bare-bones "placeholder" screen the player is sent to when other screens need to refresh, for example.
 		loadingScreen = new LoadingScreen();
 
+		screens = new HashMap<String, Screen>();
 		createScreens();
+
+		songs = new ArrayList<>();
+		loadSongs();
 
 		EventManager.getInstance().applyResolution(EventManager.getInstance().getScreenWidth(), EventManager.getInstance().getScreenHeight());
 		EventManager.getInstance().changeScreen("MainMenu");
@@ -59,5 +66,11 @@ public class AfterglowGame extends Game {
 	public static void createScreens(){
 		screens.put("MainMenu", new MainMenuScreen());
 		screens.put("Options", new OptionsScreen());
+	}
+
+	// Loads into "songs" automatically from files found in the relevant directory
+	private static void loadSongs() {
+		//TODO: Implement
+		songs.add(new Song());
 	}
 }
