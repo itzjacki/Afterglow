@@ -1,5 +1,8 @@
 package com.itzjacki.afterglow.models;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+
 public class PlayerWedge {
     // The direction the wedge is facing:
     // -1: Nowhere
@@ -15,10 +18,28 @@ public class PlayerWedge {
 
     private int state;
 
-    private final int radius = 80;
+    private final int radius = 40;
 
     public PlayerWedge(){
         state = -1;
+    }
+
+    // Should be run after calling .begin on a ShapeRenderer, with fill
+    public void drawCircle(ShapeRenderer shape, Color secondaryColor, int worldSize){
+        shape.setColor(secondaryColor);
+        shape.circle((worldSize-getRadius())/2f, (worldSize-getRadius())/2f, getRadius(), getRadius());
+    }
+
+    public void drawWedge(ShapeRenderer shape, Color primaryColor, Color secondaryColor, int worldSize){
+        shape.setColor(primaryColor);
+        if(getState() == 8){
+            shape.circle((worldSize-getRadius())/2f, (worldSize-getRadius())/2f, getRadius() + 1, getRadius());
+            shape.setColor(secondaryColor);
+            shape.circle((worldSize-getRadius())/2f, (worldSize-getRadius())/2f, getRadius() - 10, getRadius());
+        }
+        else{
+            shape.arc((worldSize-getRadius())/2f, (worldSize-getRadius())/2f, getRadius() + 1, 405 - getState() * 45 , 90, getRadius());
+        }
     }
 
     public int getState() {

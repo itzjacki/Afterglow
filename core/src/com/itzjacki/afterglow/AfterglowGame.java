@@ -16,9 +16,8 @@ import java.util.Map;
 
 
 public class AfterglowGame extends Game {
-	// Active play refers to the area where actual projectiles exist. Should be constant across resolutions for balance.
-	public static final int ACTIVE_PLAY_WIDTH = 1920;
-	public static final int ACTIVE_PLAY_HEIGHT = 1080;
+	// Active play refers to the area where projectiles, the player  wedge and so on exist. Only one dimension needed since the area is rectangular.
+	public static final int ACTIVE_PLAY_SIZE = 900;
 	public static int CURRENT_RESOLUTION_WIDTH;
 	public static int CURRENT_RESOLUTION_HEIGHT;
 	public static final String[] resolutions = new String[]{"1024x576", "1280x720", "1366x768", "1600x900", "1920x1080", "2560x1440"};
