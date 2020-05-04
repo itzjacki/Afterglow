@@ -42,7 +42,7 @@ public class PlayHUD {
         Label healthTextLabel = new Label("Health:", hudLabelStyle);
         healthLabel = new Label("100%", hudLabelStyle);
         Label scoreTextLabel = new Label("Score:", hudLabelStyle);
-        scoreLabel = new Label("1234567890", hudLabelStyle);
+        scoreLabel = new Label("0", hudLabelStyle);
         Label comboTextLabel = new Label("Combo:", hudLabelStyle);
         comboLabel = new Label("0x", hudLabelStyle);
 

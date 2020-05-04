@@ -7,16 +7,22 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.itzjacki.afterglow.AfterglowGame;
 import com.itzjacki.afterglow.controllers.EventManager;
+import com.itzjacki.afterglow.models.Bullet;
 import com.itzjacki.afterglow.models.PlayHUD;
 import com.itzjacki.afterglow.models.PlayerWedge;
+import com.itzjacki.afterglow.models.Song;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlayScreen implements Screen {
+    private Song song;
+
     private int playWorldSize;
     private OrthographicCamera gameCamera;
     private Viewport gameViewport;
@@ -24,6 +30,7 @@ public class PlayScreen implements Screen {
     private Stage playStage;
     private PlayerWedge wedge;
     private PlayHUD hud;
+    private List<Bullet> bulletList;
     private int frameWidth = 3;
 
     private Color wedgeColor;
@@ -33,12 +40,16 @@ public class PlayScreen implements Screen {
     private Color bulletColor;
     private Color frameColor;
 
-    public PlayScreen() {
+    public PlayScreen(Song song) {
+        this.song = song;
+
         // Colors are given in RGBA in hex format
+        // These should all be loaded in automatically from the song file.
         wedgeColor = new Color(Color.valueOf("211d14ff"));
         circleColor = new Color(Color.valueOf("f7f6edff"));
         backgroundColor = new Color(Color.valueOf("b5b49eff"));
         textColor =  new Color(Color.valueOf("211d14ff"));
+        bulletColor =  new Color(Color.valueOf("211d14ff"));
         frameColor =  new Color(Color.valueOf("f7f6edff"));
 
         playWorldSize = AfterglowGame.ACTIVE_PLAY_SIZE;
@@ -50,6 +61,7 @@ public class PlayScreen implements Screen {
         playStage = new Stage(gameViewport);
 
         wedge = new PlayerWedge();
+        bulletList = new ArrayList<>();
 
         hud = new PlayHUD(shape, textColor);
     }
@@ -65,41 +77,48 @@ public class PlayScreen implements Screen {
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
             System.out.println("space");
             wedge.setState(8);
-
         }
 
         else if(Gdx.input.isKeyJustPressed(Input.Keys.UP) && Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) && Gdx.input.isKeyPressed(Input.Keys.W)){
             System.out.println("up right");
             wedge.setState(1);
+            bulletList.add(new Bullet(1));
         }
         else if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN) && Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) && Gdx.input.isKeyPressed(Input.Keys.S)){
             System.out.println("down right");
             wedge.setState(3);
+            bulletList.add(new Bullet(3));
         }
         else if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN) && Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyJustPressed(Input.Keys.LEFT) && Gdx.input.isKeyPressed(Input.Keys.S)){
             System.out.println("down left");
             wedge.setState(5);
+            bulletList.add(new Bullet(5));
         }
         else if(Gdx.input.isKeyJustPressed(Input.Keys.UP) && Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyJustPressed(Input.Keys.LEFT) && Gdx.input.isKeyPressed(Input.Keys.W)){
             System.out.println("up left");
             wedge.setState(7);
+            bulletList.add(new Bullet(7));
         }
 
         else if(Gdx.input.isKeyJustPressed(Input.Keys.UP)){
             System.out.println("up");
             wedge.setState(0);
+            bulletList.add(new Bullet(0));
         }
         else if(Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)){
             System.out.println("right");
             wedge.setState(2);
+            bulletList.add(new Bullet(2));
         }
         else if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN)){
             System.out.println("down");
             wedge.setState(4);
+            bulletList.add(new Bullet(4));
         }
         else if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT)){
             System.out.println("left");
             wedge.setState(6);
+            bulletList.add(new Bullet(6));
         }
     }
 
@@ -108,9 +127,23 @@ public class PlayScreen implements Screen {
         Gdx.input.setInputProcessor(playStage);
     }
 
+    // Main render loop, runs every frame.
     @Override
     public void render(float delta) {
         handleInput();
+
+        ArrayList<Integer> deletionList = new ArrayList<>();
+        for(int i=0; i < bulletList.size(); i++){
+            if(bulletList.get(i).update(delta)){
+                // TODO: Check for hit and run command for successful or unsuccessful hit
+                deletionList.add(i);
+            }
+        }
+
+        for(Integer i:deletionList){
+            bulletList.remove((int)i);
+        }
+
         Gdx.gl.glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -124,7 +157,10 @@ public class PlayScreen implements Screen {
         shape.begin(ShapeRenderer.ShapeType.Filled);
 
         // Draws the bullets
-        // TODO: Bullets
+        shape.setColor(bulletColor);
+        for(Bullet bullet:bulletList){
+            bullet.draw(shape);
+        }
 
         // Draws the player's circle and wedge
         wedge.drawCircle(shape, circleColor, playWorldSize);

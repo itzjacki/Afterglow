@@ -21,7 +21,7 @@ public class PlayerWedge {
     private final int radius = 40;
 
     public PlayerWedge(){
-        state = -1;
+        state = 0;
     }
 
     // Should be run after calling .begin on a ShapeRenderer, with fill
@@ -38,7 +38,7 @@ public class PlayerWedge {
             shape.setColor(secondaryColor);
             shape.circle(worldSize/2f, worldSize/2f, getRadius() - 10, getRadius());
         }
-        else{
+        else if(getState() >= 0 && getState() <= 7){
             shape.arc(worldSize/2f, worldSize/2f, getRadius() + 1, 405 - getState() * 45 , 90, getRadius());
         }
     }

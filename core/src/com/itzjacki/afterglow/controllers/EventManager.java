@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.itzjacki.afterglow.AfterglowGame;
 import com.itzjacki.afterglow.models.Song;
+import com.itzjacki.afterglow.screens.PlayScreen;
 
 public class EventManager {
 
@@ -12,7 +13,7 @@ public class EventManager {
     private static final EventManager INSTANCE = new EventManager();
     private PlayerOptionManager pom;
     // im will hold the currently active instance manager when a song is being played.
-    private SongInstanceManager sim;
+    private PlayScreen songInstance;
 
     private EventManager(){
         pom = new PlayerOptionManager();
@@ -44,8 +45,8 @@ public class EventManager {
     }
 
     public void createSongInstance(Song song){
-        sim = new SongInstanceManager(song);
-        changeScreen(sim.getScreen());
+        songInstance = new PlayScreen(song);
+        changeScreen(songInstance);
     }
 
     public void saveAndApplyPreferences(){
