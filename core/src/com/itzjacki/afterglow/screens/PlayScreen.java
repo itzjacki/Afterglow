@@ -6,13 +6,14 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.itzjacki.afterglow.AfterglowGame;
 import com.itzjacki.afterglow.controllers.EventManager;
+import com.itzjacki.afterglow.models.PlayHUD;
 import com.itzjacki.afterglow.models.PlayerWedge;
 
 public class PlayScreen implements Screen {
@@ -22,12 +23,25 @@ public class PlayScreen implements Screen {
     private ShapeRenderer shape;
     private Stage playStage;
     private PlayerWedge wedge;
-    private Color primaryColor;
-    private Color secondaryColor;
+    private PlayHUD hud;
+    private int frameWidth = 3;
+
+    private Color wedgeColor;
+    private Color circleColor;
     private Color backgroundColor;
+    private Color textColor;
+    private Color bulletColor;
+    private Color frameColor;
 
     public PlayScreen() {
-        playWorldSize = 900;
+        // Colors are given in RGBA in hex format
+        wedgeColor = new Color(Color.valueOf("211d14ff"));
+        circleColor = new Color(Color.valueOf("f7f6edff"));
+        backgroundColor = new Color(Color.valueOf("b5b49eff"));
+        textColor =  new Color(Color.valueOf("211d14ff"));
+        frameColor =  new Color(Color.valueOf("f7f6edff"));
+
+        playWorldSize = AfterglowGame.ACTIVE_PLAY_SIZE;
 
         gameCamera = new OrthographicCamera();
         gameViewport = new FitViewport(AfterglowGame.ACTIVE_PLAY_SIZE, AfterglowGame.ACTIVE_PLAY_SIZE, gameCamera);
@@ -37,14 +51,16 @@ public class PlayScreen implements Screen {
 
         wedge = new PlayerWedge();
 
-        // Colors are given in RGBA in hex format
-        primaryColor = new Color(Color.valueOf("211d14ff"));
-        secondaryColor = new Color(Color.valueOf("f7f6edff"));
-        backgroundColor = new Color(Color.valueOf("b5b49eff"));
+        hud = new PlayHUD(shape, textColor);
     }
 
     // Runs before rendering happens every frame. Checks for keyboard inputs.
     private void handleInput(){
+
+        if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)){
+            System.out.println("Escape");
+            //TODO: Pause game and bring up menu
+        }
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
             System.out.println("space");
@@ -98,10 +114,27 @@ public class PlayScreen implements Screen {
         Gdx.gl.glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        // Draws HUD
+        hud.getStage().getViewport().apply();
+        hud.getStage().draw();
+
+        // Initial shape drawing stuff
+        playStage.getViewport().apply();
         shape.setProjectionMatrix(gameCamera.combined);
         shape.begin(ShapeRenderer.ShapeType.Filled);
-        wedge.drawCircle(shape, secondaryColor, playWorldSize);
-        wedge.drawWedge(shape, primaryColor, secondaryColor, playWorldSize);
+
+        // Draws the bullets
+        // TODO: Bullets
+
+        // Draws the player's circle and wedge
+        wedge.drawCircle(shape, circleColor, playWorldSize);
+        wedge.drawWedge(shape, wedgeColor, circleColor, playWorldSize);
+
+        // Draws the frame
+        shape.setColor(frameColor);
+        shape.rect(0, 0, frameWidth, playWorldSize);
+        shape.rect(playWorldSize - frameWidth, 0, frameWidth, playWorldSize);
+
         shape.end();
     }
 

@@ -27,18 +27,19 @@ public class PlayerWedge {
     // Should be run after calling .begin on a ShapeRenderer, with fill
     public void drawCircle(ShapeRenderer shape, Color secondaryColor, int worldSize){
         shape.setColor(secondaryColor);
-        shape.circle((worldSize-getRadius())/2f, (worldSize-getRadius())/2f, getRadius(), getRadius());
+        shape.circle(worldSize/2f, worldSize/2f, getRadius(), getRadius());
     }
 
+    // Should be run after calling .begin on a ShapeRenderer, with fill
     public void drawWedge(ShapeRenderer shape, Color primaryColor, Color secondaryColor, int worldSize){
         shape.setColor(primaryColor);
         if(getState() == 8){
-            shape.circle((worldSize-getRadius())/2f, (worldSize-getRadius())/2f, getRadius() + 1, getRadius());
+            shape.circle(worldSize/2f, worldSize/2f, getRadius() + 1, getRadius());
             shape.setColor(secondaryColor);
-            shape.circle((worldSize-getRadius())/2f, (worldSize-getRadius())/2f, getRadius() - 10, getRadius());
+            shape.circle(worldSize/2f, worldSize/2f, getRadius() - 10, getRadius());
         }
         else{
-            shape.arc((worldSize-getRadius())/2f, (worldSize-getRadius())/2f, getRadius() + 1, 405 - getState() * 45 , 90, getRadius());
+            shape.arc(worldSize/2f, worldSize/2f, getRadius() + 1, 405 - getState() * 45 , 90, getRadius());
         }
     }
 
