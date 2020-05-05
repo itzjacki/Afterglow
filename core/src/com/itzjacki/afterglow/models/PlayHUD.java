@@ -26,7 +26,7 @@ public class PlayHUD {
     private final Label scoreLabel;
     private final Label comboLabel;
 
-    public PlayHUD(ShapeRenderer shape, Color textColor){
+    public PlayHUD(Color textColor){
         skin = new Skin(Gdx.files.internal("flat_skin/skin/skin.json"));
         Label.LabelStyle hudLabelStyle = new Label.LabelStyle(new BitmapFont(Gdx.files.internal("fonts/AfterglowHUD/AfterglowHUD.fnt"), Gdx.files.internal("fonts/AfterglowHUD/AfterglowHUD.png"), false), textColor);
 
