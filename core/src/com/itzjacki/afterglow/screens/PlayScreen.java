@@ -11,10 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.itzjacki.afterglow.AfterglowGame;
-import com.itzjacki.afterglow.models.Bullet;
-import com.itzjacki.afterglow.models.PlayHUD;
-import com.itzjacki.afterglow.models.PlayerWedge;
-import com.itzjacki.afterglow.models.Song;
+import com.itzjacki.afterglow.models.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,12 +34,16 @@ public class PlayScreen implements Screen {
 
     // Gameplay elements
     private List<Bullet> bulletList;
-
+    private List<CircleNote> circleNoteList;
+    private List<LongNote> longNoteList;
+    private int score;
+    private int combo;
+    private float health;
 
 
     // Colors used during the song. The same color value is often used for multiple of these at a time.
-    private Color wedgeColor;
-    private Color circleColor;
+    private Color playerWedgeColor;
+    private Color playerCircleColor;
     private Color backgroundColor;
     private Color textColor;
     private Color bulletColor;
@@ -54,8 +55,8 @@ public class PlayScreen implements Screen {
 
         // Colors are given in RGBA in hex format
         // These should all be loaded in automatically from the song file.
-        wedgeColor = new Color(Color.valueOf("211d14ff"));
-        circleColor = new Color(Color.valueOf("f7f6edff"));
+        playerWedgeColor = new Color(Color.valueOf("211d14ff"));
+        playerCircleColor = new Color(Color.valueOf("f7f6edff"));
         backgroundColor = new Color(Color.valueOf("b5b49eff"));
         textColor =  new Color(Color.valueOf("211d14ff"));
         bulletColor =  new Color(Color.valueOf("211d14ff"));
@@ -71,6 +72,7 @@ public class PlayScreen implements Screen {
         hud = new PlayHUD(textColor);
 
         bulletList = new ArrayList<>();
+        circleNoteList = new ArrayList<>();
     }
 
     // Runs before rendering happens every frame. Checks for keyboard inputs.
@@ -84,6 +86,7 @@ public class PlayScreen implements Screen {
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
             System.out.println("space");
             wedge.setState(8);
+            circleNoteList.add(new CircleNote());
         }
 
         else if(Gdx.input.isKeyJustPressed(Input.Keys.UP) && Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) && Gdx.input.isKeyPressed(Input.Keys.W)){
@@ -131,6 +134,16 @@ public class PlayScreen implements Screen {
         System.out.println("Ouch! Bullet not caught");
     }
 
+    // When the player successfully catches a bullet
+    private void successfulCircleCatch(){
+        System.out.println("Circle caught!");
+    }
+
+    // When the player is hit by a bullet they didn't catch.
+    private void unsuccessfulCircleCatch(){
+        System.out.println("Ouch! Circle not caught");
+    }
+
     @Override
     public void show() {
         Gdx.input.setInputProcessor(playStage);
@@ -141,25 +154,51 @@ public class PlayScreen implements Screen {
     public void render(float delta) {
         handleInput();
 
-        ArrayList<Integer> deletionList = new ArrayList<>();
-        for(int i=0; i < bulletList.size(); i++){
-            if(bulletList.get(i).update(delta)){
-                // Checks if wedge and bullet state matches
-                if(bulletList.get(i).getState() == wedge.getState()){
-                    successfulBulletCatch();
+        // Checks and deletes bullets
+        if(!bulletList.isEmpty()) {
+            ArrayList<Integer> bulletDeletionList = new ArrayList<>();
+            for (int i = 0; i < bulletList.size(); i++) {
+                if (bulletList.get(i).update(delta)) {
+                    // Checks if wedge and bullet state matches
+                    if (bulletList.get(i).getState() == wedge.getState()) {
+                        successfulBulletCatch();
+                    } else {
+                        unsuccessfulBulletCatch();
+                    }
+                    // Adds bullet to deletion list.
+                    bulletDeletionList.add(i);
                 }
-                else{
-                    unsuccessfulBulletCatch();
-                }
-                // Adds bullet to deletion list.
-                deletionList.add(i);
+            }
+
+            // Purges bullets that are on the deletion list.
+            for (Integer i : bulletDeletionList) {
+                bulletList.remove((int) i);
             }
         }
 
-        // Purges bullets that are on the deletion list.
-        for(Integer i:deletionList){
-            bulletList.remove((int)i);
+        // Checks and deletes circle notes
+        if(!circleNoteList.isEmpty()) {
+            ArrayList<Integer> circleDeletionList = new ArrayList<>();
+            for (int i = 0; i < circleNoteList.size(); i++) {
+                if (circleNoteList.get(i).update(delta)) {
+                    // Checks if wedge state is circle
+                    if (wedge.getState() == 8) {
+                        successfulCircleCatch();
+                    } else {
+                        unsuccessfulCircleCatch();
+                    }
+                    // Adds circle note to deletion list.
+                    circleDeletionList.add(i);
+                }
+            }
+
+            // Purges bullets that are on the deletion list.
+            for (Integer i : circleDeletionList) {
+                circleNoteList.remove((int) i);
+            }
         }
+
+
 
         Gdx.gl.glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -171,6 +210,7 @@ public class PlayScreen implements Screen {
         // Initial shape drawing stuff
         playStage.getViewport().apply();
         shape.setProjectionMatrix(gameCamera.combined);
+        // Filled shapes go here (most shapes)
         shape.begin(ShapeRenderer.ShapeType.Filled);
 
         // Draws the bullets
@@ -180,15 +220,27 @@ public class PlayScreen implements Screen {
         }
 
         // Draws the player's circle and wedge
-        wedge.drawCircle(shape, circleColor, playWorldSize);
-        wedge.drawWedge(shape, wedgeColor, circleColor, playWorldSize);
-
+        wedge.drawCircle(shape, playerCircleColor, playWorldSize);
+        wedge.drawWedge(shape, playerWedgeColor, playerCircleColor, playWorldSize);
 
         // Draws the frame
         shape.setColor(frameColor);
         shape.rect(0, 0, frameWidth, playWorldSize);
         shape.rect(playWorldSize - frameWidth, 0, frameWidth, playWorldSize);
 
+        // Flushes shapes
+        shape.end();
+
+
+        // Line shapes go here (Like the circle note)
+        shape.begin(ShapeRenderer.ShapeType.Line);
+
+        shape.setColor(bulletColor);
+        for(CircleNote circleNote:circleNoteList){
+            circleNote.draw(shape);
+        }
+
+        // Flushes shapes
         shape.end();
     }
 
