@@ -49,6 +49,10 @@ public class EventManager {
         changeScreen(songInstance);
     }
 
+    public void endSongInstance(boolean songWasBeaten, int finalScore, int highestCombo){
+        // TODO: Save if high score. Prompt to upload to online high scores. Send to end screen.
+    }
+
     public void saveAndApplyPreferences(){
 
         // Resolution & fullscreen

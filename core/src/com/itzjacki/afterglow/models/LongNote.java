@@ -73,7 +73,10 @@ public class LongNote {
 
     // Updates the position of the bullet, and returns true if the bullet "activated" on this update.
     public boolean update(float dt){
-        timeRemaining -= dt;
+        if(active){
+            // Takes away the time since last frame from the note's remaining life span
+            timeRemaining -= dt * 1000;
+        }
         if(timeRemaining <= 0){
             return true;
         }
@@ -84,18 +87,30 @@ public class LongNote {
         scaledVelocity.scl(dt);
         position.add(scaledVelocity);
 
-        // When/if the bullet crosses over the middle, kill the speed and put it in the middle of the board.
-        // This ensures the bullet in the front gets out of the way before being frozen.
-        if(Math.signum(position.x - middle) != Math.signum(oldPosition.x - middle) || Math.signum(position.y - middle) != Math.signum(oldPosition.y - middle)){
-            position.x = position.y = middle;
-            velocity.x = velocity.y = 0;
-        }
-
         // Checks if a bullet is halfway covered by the middle orb. This is the point they get evaluated at.
-        else if(!active && (
+        if(!active && (
                 position.x > middle - threshold && position.x < middle + threshold && position.y == middle ||  // From the sides
                 position.y > middle - threshold && position.y < middle + threshold && position.x == middle  // From the top or bottom
         )){
+            velocity.x = velocity.y = 0;
+            if(getState() == 0){
+                position.x = middle;
+                position.y = middle + threshold - radius - 1;
+            }
+            else if(getState() == 2){
+                position.x = middle + threshold - radius - 1;
+                position.y = middle;
+
+            }
+            else if(getState() == 4){
+                position.x = middle;
+                position.y = middle - threshold + radius + 1;
+            }
+            else if(getState() == 6){
+                position.x = middle - threshold + radius + 1;
+                position.y = middle;
+            }
+
             active = true;
             // Bullets can safely be removed when they're half-way covered by the orb.
             // The next frame they would've been far inside anyway. At 600 ms times with 60 fps and
@@ -119,9 +134,36 @@ public class LongNote {
 
         // If the note should extend past the screen border
         if(Math.abs(pos - middle) + timeToPixels(timeRemaining) > areaSize/2f){
-            // TODO: Write draw method for extending past screen edge
+            if(getState() == 0){
+                shape.rect(position.x - radius, position.y, radius * 2, areaSize - position.y);
+            }
+            else if(getState() == 2){
+                shape.rect(position.x, position.y - radius, areaSize - position.x, radius * 2);
+            }
+            else if(getState() == 4){
+                shape.rect(position.x - radius, position.y, radius * 2, -position.y);
+            }
+            else if(getState() == 6){
+                shape.rect(position.x, position.y - radius, -position.x, radius * 2);
+            }
         }
-        // TODO: Write draw method for not extending past edge
+
+        if(getState() == 0){
+            shape.circle(position.x, position.y + timeToPixels(timeRemaining), radius);
+            shape.rect(position.x - radius, position.y, radius * 2, timeToPixels(timeRemaining));
+        }
+        else if(getState() == 2){
+            shape.circle(position.x + timeToPixels(timeRemaining), position.y, radius);
+            shape.rect(position.x, position.y - radius, timeToPixels(timeRemaining), radius * 2);
+        }
+        else if(getState() == 4){
+            shape.circle(position.x, position.y - timeToPixels(timeRemaining), radius);
+            shape.rect(position.x - radius, position.y, radius * 2, -timeToPixels(timeRemaining));
+        }
+        else if(getState() == 6){
+            shape.circle(position.x - timeToPixels(timeRemaining), position.y, radius);
+            shape.rect(position.x, position.y - radius, -timeToPixels(timeRemaining), radius * 2);
+        }
     }
 
     // Helper method used to calculate the length of the note at the current remaining time.
@@ -131,5 +173,9 @@ public class LongNote {
 
     public int getState(){
         return state;
+    }
+
+    public boolean isActive() {
+        return active;
     }
 }
