@@ -33,6 +33,7 @@ public class PlayScreen implements Screen {
     private PlayHUD hud;
     private int frameWidth = 3;
 
+    private boolean[] longNoteHold;
     // Gameplay elements
     private List<Bullet> bulletList;
     private List<CircleNote> circleNoteList;
@@ -40,8 +41,12 @@ public class PlayScreen implements Screen {
     private int score;
     private int combo;
     private int highestCombo;
+    // Buffers are used with long notes to save leftover points from using integer scores and combos.
+    private float comboBuffer;
+    private float scoreBuffer;
     private float health;
-
+    // scoreModifier is decided by modifiers the player has activated.
+    private float scoreModifier;
 
     // Colors used during the song. The same color value is often used for multiple of these at a time.
     private Color playerWedgeColor;
@@ -73,6 +78,9 @@ public class PlayScreen implements Screen {
         wedge = new PlayerWedge();
         hud = new PlayHUD(textColor);
 
+        // Even though there are only 4 long note directions, this holds all 8. Both for forward expandability
+        // and current code simplicity.
+        longNoteHold = new boolean[8];
         bulletList = new ArrayList<>();
         circleNoteList = new ArrayList<>();
         longNoteList = new ArrayList<>();
@@ -81,6 +89,9 @@ public class PlayScreen implements Screen {
         score = 0;
         combo = 0;
         highestCombo = 0;
+        comboBuffer = 0;
+        scoreBuffer = 0;
+        scoreModifier = EventManager.getInstance().getScoreModifier();
     }
 
     // Runs before rendering happens every frame. Checks for keyboard inputs.
@@ -120,8 +131,8 @@ public class PlayScreen implements Screen {
         }
         else if(Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)){
             wedge.setState(2);
-//            bulletList.add(new Bullet(2));
-            longNoteList.add(new LongNote(2, 200));
+            bulletList.add(new Bullet(2));
+//            longNoteList.add(new LongNote(2, 200));
         }
         else if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN)){
             wedge.setState(4);
@@ -130,8 +141,8 @@ public class PlayScreen implements Screen {
         }
         else if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT)){
             wedge.setState(6);
-//            bulletList.add(new Bullet(6));
-            longNoteList.add(new LongNote(6, 50));
+            bulletList.add(new Bullet(6));
+//            longNoteList.add(new LongNote(6, 50));
         }
     }
 
@@ -150,17 +161,24 @@ public class PlayScreen implements Screen {
         else{
             health = newHealth;
         }
+        hud.updateHealth(health);
     }
 
     private void increaseCombo(){
-        combo += 1;
+        increaseCombo(1);
+    }
+
+    private void increaseCombo(int increaseBy){
+        combo += increaseBy;
         if(combo > highestCombo){
             highestCombo = combo;
         }
+        hud.updateCombo(combo);
     }
 
     private void resetCombo(){
         combo = 0;
+        hud.updateCombo(combo);
     }
 
     // Increases score. baseIncrease is the increase in score before combo is applied.
@@ -169,41 +187,81 @@ public class PlayScreen implements Screen {
         if(combo == 0){
             comboModifier = 1;
         }
-        score = baseIncrease * comboModifier;
+        score += baseIncrease * comboModifier;
+        hud.updateScore(score);
     }
 
     // Methods for successful and unsuccessful catches for all projectiles
     // TODO: Remove debug print statements.
+    // TODO: Balancing
 
     // When the player successfully catches a bullet
     private void successfulBulletCatch(){
         System.out.println("Bullet caught!");
 
+        changeHealth(1);
+        increaseCombo();
+        // Score modifier has a maximum of one decimal, so this should never produce non-integers. If it somehow does,
+        // any decimals are curtailed when it's casted to an int anyway, at worst leading to a tiny loss of score.
+        increaseScore((int) (100 * scoreModifier));
     }
 
     // When the player is hit by a bullet they didn't catch.
     private void unsuccessfulBulletCatch(){
         System.out.println("Ouch! Bullet not caught");
+
+        changeHealth(-10);
+        resetCombo();
     }
 
-    // When the player successfully catches a bullet
+    // When the player successfully catches a circle note
     private void successfulCircleCatch(){
         System.out.println("Circle caught!");
+        changeHealth(2);
+        increaseCombo();
+        // Score modifier system works the same way as it does with the normal bullets
+        increaseScore((int) (500 * scoreModifier));
     }
 
-    // When the player is hit by a bullet they didn't catch.
+    // When the player is hit by a circle note they didn't catch.
     private void unsuccessfulCircleCatch(){
+
         System.out.println("Ouch! Circle not caught");
+        changeHealth(-10);
+        resetCombo();
     }
 
-    // When the player successfully catches a bullet
-    private void successfulLongCatch(){
-        System.out.println("Longboi caught!");
+    // When the player successfully catches a long note. Called each frame they're being hit by one.
+    // Delta time is needed in the long note catches, so the effect of them is independent of frame rate.
+    private void successfulLongCatch(float dt){
+        System.out.println("Long note caught!");
+        // Values that dictate how much the player should gain after one second of successfully catching a long note.
+        float comboPerSecond = 5;
+        float healthGainPerSecond = 5;
+        float scorePerSecond = 1000 * scoreModifier;
+
+        // Moves excess combo into buffer (everything after the decimal point)
+        comboBuffer += comboPerSecond * dt;
+        // If there's a combo ready in the buffer, add this to the new combo counter.
+        increaseCombo((int) comboBuffer);
+        // remove the extra combo that has been moved into the buffer from the new combo score
+        comboBuffer -= Math.floor(comboBuffer);
+
+        // Performs the same process for score.
+        scoreBuffer += scorePerSecond * dt;
+        increaseScore((int) scoreBuffer);
+        scoreBuffer -= Math.floor(scoreBuffer);
+
+        changeHealth(healthGainPerSecond * dt);
     }
 
-    // When the player is hit by a bullet they didn't catch.
-    private void unsuccessfulLongCatch(){
-        System.out.println("Ouch! Longboi not caught");
+    // When the player is hit by a long note they didn't catch. Called each frame they're being hit.
+    private void unsuccessfulLongCatch(float dt){
+        System.out.println("Ouch! Long note not caught");
+        float healthLossPerSecond = 30;
+
+        resetCombo();
+        changeHealth(-healthLossPerSecond * dt);
     }
 
     @Override
@@ -266,6 +324,9 @@ public class PlayScreen implements Screen {
             }
         }
 
+        // this variable is set to all false every frame, but if the player is holding a long note, its set to true
+        // on the applicable side. After dealing with long notes, longNoteHold is set to this list.
+        boolean[] keepHoldingLongNote = new boolean[8];
         // Checks and deletes long notes
         if(!longNoteList.isEmpty()) {
             ArrayList<Integer> longDeletionList = new ArrayList<>();
@@ -275,11 +336,20 @@ public class PlayScreen implements Screen {
                 boolean markedToDelete = longNoteList.get(i).update(delta);
 
                 if (longNoteList.get(i).isActive()) {
+                    int noteState = longNoteList.get(i).getState();
                     // Checks if wedge state is circle
-                    if (longNoteList.get(i).getState() == wedge.getState()) {
-                        successfulLongCatch();
-                    } else {
-                        unsuccessfulLongCatch();
+                    if (noteState == wedge.getState()) {
+                        successfulLongCatch(delta);
+                        longNoteHold[noteState] = true;
+                        keepHoldingLongNote[noteState] = true;
+                    }
+                    else if(longNoteHold[noteState] && EventManager.getInstance().isArrowPressed(noteState)){
+                        successfulLongCatch(delta);
+                        keepHoldingLongNote[noteState] = true;
+                    }
+                    else {
+                        unsuccessfulLongCatch(delta);
+                        longNoteHold[longNoteList.get(i).getState()] = false;
                     }
                 }
 
@@ -294,8 +364,7 @@ public class PlayScreen implements Screen {
                 longNoteList.remove((int) i);
             }
         }
-
-
+        longNoteHold = keepHoldingLongNote;
 
         Gdx.gl.glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -320,7 +389,7 @@ public class PlayScreen implements Screen {
         }
 
         // Draws the player's circle and wedge
-        wedge.drawCircle(shape, playerCircleColor, playWorldSize);
+        wedge.drawCircle(shape, playerCircleColor, playerWedgeColor, longNoteHold, playWorldSize);
         wedge.drawWedge(shape, playerWedgeColor, playerCircleColor, playWorldSize);
 
         // Draws the frame

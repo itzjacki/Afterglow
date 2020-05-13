@@ -46,6 +46,10 @@ public class CircleNote {
 
     // Should be run after color has been set, and with the begin (fill) called.
     public void draw(ShapeRenderer shape){
+        // Draws three circles next to each other for added thickness.
+        // The middle one is the one that actually represents the activation point.
+        shape.circle(areaSize/2f, areaSize/2f, size - 1, (int)size - 1);
         shape.circle(areaSize/2f, areaSize/2f, size, (int)size);
+        shape.circle(areaSize/2f, areaSize/2f, size + 1, (int)size + 1);
     }
 }

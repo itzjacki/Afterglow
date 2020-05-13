@@ -2,6 +2,7 @@ package com.itzjacki.afterglow.models;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.itzjacki.afterglow.controllers.EventManager;
 
 public class PlayerWedge {
     // The direction the wedge is facing:
@@ -25,7 +26,15 @@ public class PlayerWedge {
     }
 
     // Should be run after calling .begin on a ShapeRenderer, with fill
-    public void drawCircle(ShapeRenderer shape, Color secondaryColor, int worldSize){
+    public void drawCircle(ShapeRenderer shape, Color secondaryColor, Color primaryColor, boolean[] longNoteHold, int worldSize){
+        // Draws the graphic for long notes being currently held
+        shape.setColor(primaryColor);
+        for(int i = 0; i < longNoteHold.length; i++){
+            if(longNoteHold[i] && EventManager.getInstance().isArrowPressed(i)){
+                shape.arc(worldSize/2f, worldSize/2f, getRadius() + 10, 405 - i * 45 , 90, getRadius());
+            }
+        }
+        // Draws the circle under the player wedge
         shape.setColor(secondaryColor);
         shape.circle(worldSize/2f, worldSize/2f, getRadius(), getRadius());
     }
