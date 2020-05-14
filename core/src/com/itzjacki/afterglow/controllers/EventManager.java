@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.itzjacki.afterglow.AfterglowGame;
 import com.itzjacki.afterglow.models.Song;
+import com.itzjacki.afterglow.screens.MainMenuScreen;
 import com.itzjacki.afterglow.screens.PlayScreen;
 
 public class EventManager {
@@ -64,8 +65,10 @@ public class EventManager {
                 System.out.println("Tried to go to screen which doesn't exist: " + screenName); // To be used during development. Less severe.
                 // throw new IllegalArgumentException("Tried to go to screen which doesn't exist: " + screenName);
             }
-            changeScreen(chosenScreen);
-            System.out.println("Changed to screen: " + screenName); // for debugging
+            else{
+                changeScreen(chosenScreen);
+                System.out.println("Changed to screen: " + screenName); // for debugging
+            }
         }
     }
     // Changes to screen explicitly passed in parameter
@@ -80,6 +83,8 @@ public class EventManager {
 
     public void endSongInstance(boolean songWasBeaten, int finalScore, int highestCombo){
         System.out.println("Song ended");
+        changeScreen("MainMenu");
+        songInstance.dispose();
         // TODO: Save if high score. Prompt to upload to online high scores. Send to end screen.
     }
 

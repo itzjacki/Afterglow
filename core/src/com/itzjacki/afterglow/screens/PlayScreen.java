@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.itzjacki.afterglow.AfterglowGame;
 import com.itzjacki.afterglow.controllers.EventManager;
+import com.itzjacki.afterglow.controllers.MusicPlayer;
 import com.itzjacki.afterglow.models.*;
 
 import java.util.ArrayList;
@@ -20,6 +21,9 @@ import java.util.List;
 public class PlayScreen implements Screen {
     // Song being played
     private Song song;
+
+    // Music player for the song being played
+    private MusicPlayer musicPlayer;
 
     // Camera and view
     private int playWorldSize;
@@ -59,6 +63,8 @@ public class PlayScreen implements Screen {
 
     public PlayScreen(Song song) {
         this.song = song;
+
+        this.musicPlayer = new MusicPlayer(song);
 
         // Colors are given in RGBA in hex format
         // These should all be loaded in automatically from the song file.
@@ -100,6 +106,7 @@ public class PlayScreen implements Screen {
         if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)){
             System.out.println("Escape");
             //TODO: Pause game and bring up menu
+            EventManager.getInstance().endSongInstance(false, score, highestCombo); // To quickly end song for testing. Remove when menu is in place.
         }
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
@@ -366,12 +373,9 @@ public class PlayScreen implements Screen {
         }
         longNoteHold = keepHoldingLongNote;
 
+        // Actual graphics rendering starts here.
         Gdx.gl.glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        // Draws HUD
-        hud.getStage().getViewport().apply();
-        hud.getStage().draw();
 
         // Initial shape drawing stuff
         playStage.getViewport().apply();
@@ -411,6 +415,13 @@ public class PlayScreen implements Screen {
 
         // Flushes shapes
         shape.end();
+
+        // Draws HUD on top of everything
+        hud.getStage().getViewport().apply();
+        hud.getStage().draw();
+
+        // Drawing the HUD last also ensures that a "full" resolution viewport is always the one that is applied when
+        // the game moves to a different screen. Other screens don't constantly apply their viewports.
     }
 
     @Override
@@ -435,6 +446,6 @@ public class PlayScreen implements Screen {
 
     @Override
     public void dispose() {
-
+        musicPlayer.dispose();
     }
 }

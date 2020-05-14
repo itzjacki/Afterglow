@@ -27,8 +27,8 @@ public class PlayerOptionManager {
         // Nickname should never have to rely on default value. Dedicated saving function is used in practice,
         // it is only included here for completeness sake. (in case i forget about this later lol)
         nickname = prefs.getString("nickname", "null");
-        audioEffectLevel = prefs.getFloat("audioEffectLevel", 1f);
-        musicLevel = prefs.getFloat("musicLevel", 1f);
+        audioEffectLevel = prefs.getFloat("audioEffectLevel", 0.5f);  // Values can be 0 - 1
+        musicLevel = prefs.getFloat("musicLevel", 0.5f);  // Values can be 0 - 1
     }
 
     protected void saveAllToFile(){
