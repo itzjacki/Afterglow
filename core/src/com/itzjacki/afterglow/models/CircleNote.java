@@ -3,7 +3,7 @@ package com.itzjacki.afterglow.models;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.itzjacki.afterglow.AfterglowGame;
 
-public class CircleNote {
+public class CircleNote implements Note{
     private float size;
     private float velocity;  // Pixels per second
     private float areaSize;
@@ -51,5 +51,9 @@ public class CircleNote {
         shape.circle(areaSize/2f, areaSize/2f, size - 1, (int)size - 1);
         shape.circle(areaSize/2f, areaSize/2f, size, (int)size);
         shape.circle(areaSize/2f, areaSize/2f, size + 1, (int)size + 1);
+    }
+
+    public int getState(){
+        return 8;
     }
 }

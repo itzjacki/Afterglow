@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.itzjacki.afterglow.AfterglowGame;
 
-public class LongNote {
+public class LongNote implements Note{
     private Vector2 position;
     private Vector2 velocity;  // Pixels per second
     private float speed;

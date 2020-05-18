@@ -39,7 +39,7 @@ public class PlayScreen implements Screen {
 
     private boolean[] longNoteHold;
     // Gameplay elements
-    private List<Bullet> bulletList;
+    private List<ShortNote> shortNoteList;
     private List<CircleNote> circleNoteList;
     private List<LongNote> longNoteList;
     private int score;
@@ -87,7 +87,7 @@ public class PlayScreen implements Screen {
         // Even though there are only 4 long note directions, this holds all 8. Both for forward expandability
         // and current code simplicity.
         longNoteHold = new boolean[8];
-        bulletList = new ArrayList<>();
+        shortNoteList = new ArrayList<>();
         circleNoteList = new ArrayList<>();
         longNoteList = new ArrayList<>();
 
@@ -101,6 +101,7 @@ public class PlayScreen implements Screen {
     }
 
     // Runs before rendering happens every frame. Checks for keyboard inputs.
+
     private void handleInput(){
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)){
@@ -117,19 +118,19 @@ public class PlayScreen implements Screen {
 
         else if(Gdx.input.isKeyJustPressed(Input.Keys.UP) && Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) && Gdx.input.isKeyPressed(Input.Keys.W)){
             wedge.setState(1);
-            bulletList.add(new Bullet(1));
+            shortNoteList.add(new ShortNote(1));
         }
         else if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN) && Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) && Gdx.input.isKeyPressed(Input.Keys.S)){
             wedge.setState(3);
-            bulletList.add(new Bullet(3));
+            shortNoteList.add(new ShortNote(3));
         }
         else if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN) && Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyJustPressed(Input.Keys.LEFT) && Gdx.input.isKeyPressed(Input.Keys.S)){
             wedge.setState(5);
-            bulletList.add(new Bullet(5));
+            shortNoteList.add(new ShortNote(5));
         }
         else if(Gdx.input.isKeyJustPressed(Input.Keys.UP) && Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyJustPressed(Input.Keys.LEFT) && Gdx.input.isKeyPressed(Input.Keys.W)){
             wedge.setState(7);
-            bulletList.add(new Bullet(7));
+            shortNoteList.add(new ShortNote(7));
         }
 
         else if(Gdx.input.isKeyJustPressed(Input.Keys.UP)){
@@ -138,7 +139,7 @@ public class PlayScreen implements Screen {
         }
         else if(Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)){
             wedge.setState(2);
-            bulletList.add(new Bullet(2));
+            shortNoteList.add(new ShortNote(2));
 //            longNoteList.add(new LongNote(2, 200));
         }
         else if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN)){
@@ -148,11 +149,10 @@ public class PlayScreen implements Screen {
         }
         else if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT)){
             wedge.setState(6);
-            bulletList.add(new Bullet(6));
+            shortNoteList.add(new ShortNote(6));
 //            longNoteList.add(new LongNote(6, 50));
         }
     }
-
     private void changeHealth(float healthChange){
         float newHealth = health + healthChange;
         // Makes sure player doesn't go over 100 health
@@ -189,6 +189,7 @@ public class PlayScreen implements Screen {
     }
 
     // Increases score. baseIncrease is the increase in score before combo is applied.
+
     private void increaseScore(int baseIncrease){
         int comboModifier = combo;
         if(combo == 0){
@@ -201,8 +202,8 @@ public class PlayScreen implements Screen {
     // Methods for successful and unsuccessful catches for all projectiles
     // TODO: Remove debug print statements.
     // TODO: Balancing
-
     // When the player successfully catches a bullet
+
     private void successfulBulletCatch(){
         System.out.println("Bullet caught!");
 
@@ -212,16 +213,16 @@ public class PlayScreen implements Screen {
         // any decimals are curtailed when it's casted to an int anyway, at worst leading to a tiny loss of score.
         increaseScore((int) (100 * scoreModifier));
     }
-
     // When the player is hit by a bullet they didn't catch.
+
     private void unsuccessfulBulletCatch(){
         System.out.println("Ouch! Bullet not caught");
 
         changeHealth(-10);
         resetCombo();
     }
-
     // When the player successfully catches a circle note
+
     private void successfulCircleCatch(){
         System.out.println("Circle caught!");
         changeHealth(2);
@@ -229,17 +230,17 @@ public class PlayScreen implements Screen {
         // Score modifier system works the same way as it does with the normal bullets
         increaseScore((int) (500 * scoreModifier));
     }
-
     // When the player is hit by a circle note they didn't catch.
+
     private void unsuccessfulCircleCatch(){
 
         System.out.println("Ouch! Circle not caught");
         changeHealth(-10);
         resetCombo();
     }
-
     // When the player successfully catches a long note. Called each frame they're being hit by one.
     // Delta time is needed in the long note catches, so the effect of them is independent of frame rate.
+
     private void successfulLongCatch(float dt){
         System.out.println("Long note caught!");
         // Values that dictate how much the player should gain after one second of successfully catching a long note.
@@ -261,14 +262,50 @@ public class PlayScreen implements Screen {
 
         changeHealth(healthGainPerSecond * dt);
     }
-
     // When the player is hit by a long note they didn't catch. Called each frame they're being hit.
+
     private void unsuccessfulLongCatch(float dt){
         System.out.println("Ouch! Long note not caught");
         float healthLossPerSecond = 30;
 
         resetCombo();
         changeHealth(-healthLossPerSecond * dt);
+    }
+
+    public List<ShortNote> getShortNoteList() {
+        return shortNoteList;
+    }
+
+    public List<CircleNote> getCircleNoteList() {
+        return circleNoteList;
+    }
+
+    public List<LongNote> getLongNoteList() {
+        return longNoteList;
+    }
+
+    public Color getPlayerWedgeColor() {
+        return playerWedgeColor;
+    }
+
+    public Color getPlayerCircleColor() {
+        return playerCircleColor;
+    }
+
+    public Color getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    public Color getTextColor() {
+        return textColor;
+    }
+
+    public Color getBulletColor() {
+        return bulletColor;
+    }
+
+    public Color getFrameColor() {
+        return frameColor;
     }
 
     @Override
@@ -282,27 +319,27 @@ public class PlayScreen implements Screen {
         handleInput();
 
         // Checks and deletes bullets
-        if(!bulletList.isEmpty()) {
-            ArrayList<Integer> bulletDeletionList = new ArrayList<>();
+        if(!shortNoteList.isEmpty()) {
+            ArrayList<Integer> shortNoteDeletionList = new ArrayList<>();
 
-            for (int i = 0; i < bulletList.size(); i++) {
+            for (int i = 0; i < shortNoteList.size(); i++) {
 
-                if (bulletList.get(i).update(delta)) {
+                if (shortNoteList.get(i).update(delta)) {
                     // Checks if wedge and bullet state matches
-                    if (bulletList.get(i).getState() == wedge.getState()) {
+                    if (shortNoteList.get(i).getState() == wedge.getState()) {
                         successfulBulletCatch();
                     } else {
                         unsuccessfulBulletCatch();
                     }
 
                     // Adds bullet to deletion list.
-                    bulletDeletionList.add(i);
+                    shortNoteDeletionList.add(i);
                 }
             }
 
             // Purges bullets that are on the deletion list.
-            for (Integer i : bulletDeletionList) {
-                bulletList.remove((int) i);
+            for (Integer i : shortNoteDeletionList) {
+                shortNoteList.remove((int) i);
             }
         }
 
@@ -314,7 +351,7 @@ public class PlayScreen implements Screen {
 
                 if (circleNoteList.get(i).update(delta)) {
                     // Checks if wedge state is circle
-                    if (wedge.getState() == 8) {
+                    if (wedge.getState() == circleNoteList.get(i).getState()) {
                         successfulCircleCatch();
                     } else {
                         unsuccessfulCircleCatch();
@@ -385,8 +422,8 @@ public class PlayScreen implements Screen {
 
         // Draws the bullets
         shape.setColor(bulletColor);
-        for(Bullet bullet:bulletList){
-            bullet.draw(shape);
+        for(ShortNote shortNote : shortNoteList){
+            shortNote.draw(shape);
         }
         for(LongNote longNote:longNoteList){
             longNote.draw(shape);

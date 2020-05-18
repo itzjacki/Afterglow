@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.itzjacki.afterglow.AfterglowGame;
 
-public class Bullet {
+public class ShortNote implements Note {
     private Vector2 position;
     private Vector2 velocity;  // Pixels per second
     private int state;
@@ -17,7 +17,7 @@ public class Bullet {
     private int cornerThreshold;
 
     // timeAlive is how long it should take for the bullet to reach the center in milliseconds. Default = 600.
-    public Bullet(int state, float timeAlive, int areaSize, int wedgeOrbRadius){
+    public ShortNote(int state, float timeAlive, int areaSize, int wedgeOrbRadius){
         this.state = state;
 
         this.areaSize = areaSize;
@@ -73,12 +73,12 @@ public class Bullet {
     }
 
     // Constructor that uses default values. This is the one used in practice so far.
-    public Bullet(int state){
+    public ShortNote(int state){
         this(state, 600, AfterglowGame.ACTIVE_PLAY_SIZE, 40);
     }
 
     // Constructor that uses default values, but with custom time alive.
-    public Bullet(int state, int timeAlive){
+    public ShortNote(int state, int timeAlive){
         this(state, timeAlive, AfterglowGame.ACTIVE_PLAY_SIZE, 40);
     }
 
