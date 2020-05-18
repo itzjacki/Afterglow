@@ -19,6 +19,7 @@ public class PlayerWedge {
 
     private int state;
 
+    // Radius of the wedge
     private final int radius = 40;
 
     public PlayerWedge(){

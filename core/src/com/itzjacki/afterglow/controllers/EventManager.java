@@ -85,6 +85,7 @@ public class EventManager {
         System.out.println("Song ended");
         changeScreen("MainMenu");
         songInstance.dispose();
+        songInstance = null;
         // TODO: Save if high score. Prompt to upload to online high scores. Send to end screen.
     }
 

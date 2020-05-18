@@ -26,7 +26,7 @@ public class LongNote implements Note{
         this.areaSize = areaSize;
         this.middle = areaSize/2f;
         this.timeAlive = timeAlive;
-        this.speed = AfterglowGame.ACTIVE_PLAY_SIZE / 2f / (timeAlive / 1000);
+        this.speed = (AfterglowGame.ACTIVE_PLAY_SIZE - wedgeOrbRadius) / 2f / (timeAlive / 1000);
         threshold = wedgeOrbRadius;
 
 
@@ -59,16 +59,6 @@ public class LongNote implements Note{
             default:
                 throw new IllegalArgumentException("Tried to create long note type that doesn't exist: " + state);
         }
-    }
-
-    // Constructor that uses default values. This is the one used in practice so far.
-    public LongNote(int state, int timeActive){
-        this(state, timeActive, 600, AfterglowGame.ACTIVE_PLAY_SIZE, 40);
-    }
-
-    // Constructor that uses default values, but with custom time alive.
-    public LongNote(int state, int timeActive, int timeAlive){
-        this(state, timeActive, timeAlive, AfterglowGame.ACTIVE_PLAY_SIZE, 40);
     }
 
     // Updates the position of the bullet, and returns true if the bullet "activated" on this update.

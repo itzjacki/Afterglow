@@ -18,6 +18,10 @@ public class MusicPlayer {
         System.out.println("Playing: " + music.isPlaying());
     }
 
+    public float getPlaybackTime(){
+        return music.getPosition();
+    }
+
     public void dispose(){
         music.dispose();
     }

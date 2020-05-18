@@ -21,7 +21,7 @@ public class ShortNote implements Note {
         this.state = state;
 
         this.areaSize = areaSize;
-        float speed = AfterglowGame.ACTIVE_PLAY_SIZE / 2f / (timeAlive / 1000);
+        float speed = (AfterglowGame.ACTIVE_PLAY_SIZE - wedgeOrbRadius) / 2f / (timeAlive / 1000);
         threshold = wedgeOrbRadius;
         cornerThreshold = (int)(Math.sin(Math.PI/4) * threshold);
 
@@ -70,16 +70,6 @@ public class ShortNote implements Note {
             default:
                 throw new IllegalArgumentException("Tried to create bullet type that doesn't exist: " + state);
         }
-    }
-
-    // Constructor that uses default values. This is the one used in practice so far.
-    public ShortNote(int state){
-        this(state, 600, AfterglowGame.ACTIVE_PLAY_SIZE, 40);
-    }
-
-    // Constructor that uses default values, but with custom time alive.
-    public ShortNote(int state, int timeAlive){
-        this(state, timeAlive, AfterglowGame.ACTIVE_PLAY_SIZE, 40);
     }
 
     // Updates the position of the bullet, and returns true if the bullet "activated" on this update.

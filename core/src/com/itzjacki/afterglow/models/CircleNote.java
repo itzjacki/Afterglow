@@ -17,18 +17,8 @@ public class CircleNote implements Note{
         threshold = wedgeOrbRadius;
 
         System.out.println("Circle note spawned");
-        velocity = - AfterglowGame.ACTIVE_PLAY_SIZE / 2f / (timeAlive / 1000);
+        velocity = - (AfterglowGame.ACTIVE_PLAY_SIZE - wedgeOrbRadius) / 2f / (timeAlive / 1000);
         size = areaSize/2f/(float)(Math.sin(Math.PI/4));
-    }
-
-    // Constructor that uses default values. This is the one used in practice so far.
-    public CircleNote(){
-        this(600, AfterglowGame.ACTIVE_PLAY_SIZE, 40);
-    }
-
-    // Constructor that uses default values, but with custom time alive.
-    public CircleNote(int timeAlive){
-        this(timeAlive, AfterglowGame.ACTIVE_PLAY_SIZE, 40);
     }
 
     // Updates the position of the bullet, and returns true if the bullet "activated" on this update.

@@ -13,6 +13,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.itzjacki.afterglow.AfterglowGame;
 import com.itzjacki.afterglow.controllers.EventManager;
 import com.itzjacki.afterglow.controllers.MusicPlayer;
+import com.itzjacki.afterglow.controllers.NoteFactory;
+import com.itzjacki.afterglow.controllers.TimeManager;
 import com.itzjacki.afterglow.models.*;
 
 import java.util.ArrayList;
@@ -24,6 +26,10 @@ public class PlayScreen implements Screen {
 
     // Music player for the song being played
     private MusicPlayer musicPlayer;
+
+    private NoteFactory noteFactory;
+
+    private TimeManager timeManager;
 
     // Camera and view
     private int playWorldSize;
@@ -53,18 +59,18 @@ public class PlayScreen implements Screen {
     private float scoreModifier;
 
     // Colors used during the song. The same color value is often used for multiple of these at a time.
+
     private Color playerWedgeColor;
     private Color playerCircleColor;
     private Color backgroundColor;
     private Color textColor;
-    private Color bulletColor;
+    private Color noteColor;
     private Color frameColor;
-
 
     public PlayScreen(Song song) {
         this.song = song;
 
-        this.musicPlayer = new MusicPlayer(song);
+        musicPlayer = new MusicPlayer(song);
 
         // Colors are given in RGBA in hex format
         // These should all be loaded in automatically from the song file.
@@ -72,7 +78,7 @@ public class PlayScreen implements Screen {
         playerCircleColor = new Color(Color.valueOf("f7f6edff"));
         backgroundColor = new Color(Color.valueOf("b5b49eff"));
         textColor =  new Color(Color.valueOf("211d14ff"));
-        bulletColor =  new Color(Color.valueOf("211d14ff"));
+        noteColor =  new Color(Color.valueOf("211d14ff"));
         frameColor =  new Color(Color.valueOf("f7f6edff"));
 
         playWorldSize = AfterglowGame.ACTIVE_PLAY_SIZE;
@@ -83,6 +89,12 @@ public class PlayScreen implements Screen {
         shape = new ShapeRenderer();
         wedge = new PlayerWedge();
         hud = new PlayHUD(textColor);
+
+        // Creates noteFactory with default values from song and app window.
+        noteFactory = new NoteFactory(this.song.getDefaultTimeAlive(), AfterglowGame.ACTIVE_PLAY_SIZE, wedge.getRadius());
+
+        // Creates the time manager after the factory has been created, because it uses the factory.
+        timeManager = new TimeManager(song, this);
 
         // Even though there are only 4 long note directions, this holds all 8. Both for forward expandability
         // and current code simplicity.
@@ -100,59 +112,46 @@ public class PlayScreen implements Screen {
         scoreModifier = EventManager.getInstance().getScoreModifier();
     }
 
-    // Runs before rendering happens every frame. Checks for keyboard inputs.
 
+    // Runs before rendering happens every frame. Checks for keyboard inputs and adjusts wedge accordingly.
     private void handleInput(){
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)){
-            System.out.println("Escape");
             //TODO: Pause game and bring up menu
             EventManager.getInstance().endSongInstance(false, score, highestCombo); // To quickly end song for testing. Remove when menu is in place.
         }
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
-            System.out.println("space");
             wedge.setState(8);
-            circleNoteList.add(new CircleNote());
         }
 
         else if(Gdx.input.isKeyJustPressed(Input.Keys.UP) && Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) && Gdx.input.isKeyPressed(Input.Keys.W)){
             wedge.setState(1);
-            shortNoteList.add(new ShortNote(1));
         }
         else if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN) && Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) && Gdx.input.isKeyPressed(Input.Keys.S)){
             wedge.setState(3);
-            shortNoteList.add(new ShortNote(3));
         }
         else if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN) && Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyJustPressed(Input.Keys.LEFT) && Gdx.input.isKeyPressed(Input.Keys.S)){
             wedge.setState(5);
-            shortNoteList.add(new ShortNote(5));
         }
         else if(Gdx.input.isKeyJustPressed(Input.Keys.UP) && Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyJustPressed(Input.Keys.LEFT) && Gdx.input.isKeyPressed(Input.Keys.W)){
             wedge.setState(7);
-            shortNoteList.add(new ShortNote(7));
         }
 
         else if(Gdx.input.isKeyJustPressed(Input.Keys.UP)){
             wedge.setState(0);
-            longNoteList.add(new LongNote(0, 1000));
         }
         else if(Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)){
             wedge.setState(2);
-            shortNoteList.add(new ShortNote(2));
-//            longNoteList.add(new LongNote(2, 200));
         }
         else if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN)){
             wedge.setState(4);
-//            bulletList.add(new Bullet(4));
-            longNoteList.add(new LongNote(4, 2000));
         }
         else if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT)){
             wedge.setState(6);
-            shortNoteList.add(new ShortNote(6));
-//            longNoteList.add(new LongNote(6, 50));
         }
     }
+
     private void changeHealth(float healthChange){
         float newHealth = health + healthChange;
         // Makes sure player doesn't go over 100 health
@@ -170,7 +169,6 @@ public class PlayScreen implements Screen {
         }
         hud.updateHealth(health);
     }
-
     private void increaseCombo(){
         increaseCombo(1);
     }
@@ -188,8 +186,8 @@ public class PlayScreen implements Screen {
         hud.updateCombo(combo);
     }
 
-    // Increases score. baseIncrease is the increase in score before combo is applied.
 
+    // Increases score. baseIncrease is the increase in score before combo is applied.
     private void increaseScore(int baseIncrease){
         int comboModifier = combo;
         if(combo == 0){
@@ -199,50 +197,57 @@ public class PlayScreen implements Screen {
         hud.updateScore(score);
     }
 
+    private void debugTimeDelta(){
+        System.out.println("Game time: " + timeManager.getTime() + ", song time: " + musicPlayer.getPlaybackTime() + ", Delta: " + (timeManager.getTime() - musicPlayer.getPlaybackTime()));
+    }
+
+
     // Methods for successful and unsuccessful catches for all projectiles
     // TODO: Remove debug print statements.
     // TODO: Balancing
     // When the player successfully catches a bullet
-
     private void successfulBulletCatch(){
-        System.out.println("Bullet caught!");
-
+//        System.out.println("Bullet caught!");
+        debugTimeDelta();
         changeHealth(1);
         increaseCombo();
         // Score modifier has a maximum of one decimal, so this should never produce non-integers. If it somehow does,
         // any decimals are curtailed when it's casted to an int anyway, at worst leading to a tiny loss of score.
         increaseScore((int) (100 * scoreModifier));
     }
-    // When the player is hit by a bullet they didn't catch.
 
+    // When the player is hit by a bullet they didn't catch.
     private void unsuccessfulBulletCatch(){
-        System.out.println("Ouch! Bullet not caught");
+        debugTimeDelta();
+//        System.out.println("Ouch! Bullet not caught");
 
         changeHealth(-10);
         resetCombo();
     }
-    // When the player successfully catches a circle note
 
+    // When the player successfully catches a circle note
     private void successfulCircleCatch(){
-        System.out.println("Circle caught!");
+//        System.out.println("Circle caught!");
+        debugTimeDelta();
         changeHealth(2);
         increaseCombo();
         // Score modifier system works the same way as it does with the normal bullets
         increaseScore((int) (500 * scoreModifier));
     }
+
     // When the player is hit by a circle note they didn't catch.
-
     private void unsuccessfulCircleCatch(){
-
-        System.out.println("Ouch! Circle not caught");
+        debugTimeDelta();
+//        System.out.println("Ouch! Circle not caught");
         changeHealth(-10);
         resetCombo();
     }
+
     // When the player successfully catches a long note. Called each frame they're being hit by one.
     // Delta time is needed in the long note catches, so the effect of them is independent of frame rate.
-
     private void successfulLongCatch(float dt){
-        System.out.println("Long note caught!");
+        debugTimeDelta();
+//        System.out.println("Long note caught!");
         // Values that dictate how much the player should gain after one second of successfully catching a long note.
         float comboPerSecond = 5;
         float healthGainPerSecond = 5;
@@ -262,50 +267,57 @@ public class PlayScreen implements Screen {
 
         changeHealth(healthGainPerSecond * dt);
     }
-    // When the player is hit by a long note they didn't catch. Called each frame they're being hit.
 
+    // When the player is hit by a long note they didn't catch. Called each frame they're being hit.
     private void unsuccessfulLongCatch(float dt){
-        System.out.println("Ouch! Long note not caught");
+        debugTimeDelta();
+//        System.out.println("Ouch! Long note not caught");
         float healthLossPerSecond = 30;
 
         resetCombo();
         changeHealth(-healthLossPerSecond * dt);
     }
 
-    public List<ShortNote> getShortNoteList() {
-        return shortNoteList;
+    // Getters and setters
+
+    public void addShortNote(ShortNote note) {
+        shortNoteList.add(note);
     }
 
-    public List<CircleNote> getCircleNoteList() {
-        return circleNoteList;
+    public void addLongNote(LongNote note) {
+        longNoteList.add(note);
     }
 
-    public List<LongNote> getLongNoteList() {
-        return longNoteList;
+    public void addCircleNote(CircleNote note) {
+        circleNoteList.add(note);
     }
 
-    public Color getPlayerWedgeColor() {
-        return playerWedgeColor;
+    public NoteFactory getNoteFactory(){
+        return noteFactory;
     }
 
-    public Color getPlayerCircleColor() {
-        return playerCircleColor;
+    public void setPlayerWedgeColor(Color playerWedgeColor) {
+        this.playerWedgeColor = playerWedgeColor;
     }
 
-    public Color getBackgroundColor() {
-        return backgroundColor;
+    public void setPlayerCircleColor(Color playerCircleColor) {
+        this.playerCircleColor = playerCircleColor;
     }
 
-    public Color getTextColor() {
-        return textColor;
+    public void setBackgroundColor(Color backgroundColor) {
+        this.backgroundColor = backgroundColor;
     }
 
-    public Color getBulletColor() {
-        return bulletColor;
+    public void setTextColor(Color textColor) {
+        this.textColor = textColor;
     }
 
-    public Color getFrameColor() {
-        return frameColor;
+    public void setNoteColor(Color noteColor) {
+        this.noteColor = noteColor;
+    }
+
+    public void setFrameColor(Color frameColor) {
+        this.frameColor = frameColor;
     }
 
     @Override
@@ -317,6 +329,7 @@ public class PlayScreen implements Screen {
     @Override
     public void render(float delta) {
         handleInput();
+        timeManager.update(delta);
 
         // Checks and deletes bullets
         if(!shortNoteList.isEmpty()) {
@@ -421,7 +434,7 @@ public class PlayScreen implements Screen {
         shape.begin(ShapeRenderer.ShapeType.Filled);
 
         // Draws the bullets
-        shape.setColor(bulletColor);
+        shape.setColor(noteColor);
         for(ShortNote shortNote : shortNoteList){
             shortNote.draw(shape);
         }
@@ -445,7 +458,7 @@ public class PlayScreen implements Screen {
         // Line shapes go here (Like the circle note)
         shape.begin(ShapeRenderer.ShapeType.Line);
 
-        shape.setColor(bulletColor);
+        shape.setColor(noteColor);
         for(CircleNote circleNote:circleNoteList){
             circleNote.draw(shape);
         }
