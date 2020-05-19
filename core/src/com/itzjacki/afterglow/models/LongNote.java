@@ -32,22 +32,18 @@ public class LongNote implements Note{
 
         switch (state) {
             case 0:
-                System.out.println("N: Long note spawned.");
                 position = new Vector2(areaSize/2f, areaSize + radius);
                 velocity = new Vector2(0, -speed);
                 break;
             case 2:
-                System.out.println("E: Long note spawned");
                 position = new Vector2(areaSize + radius, areaSize/2f);
                 velocity = new Vector2(-speed, 0);
                 break;
             case 4:
-                System.out.println("S: Long note spawned");
                 position = new Vector2(areaSize/2f, -radius);
                 velocity = new Vector2(0, speed);
                 break;
             case 6:
-                System.out.println("W: Long note spawned");
                 position = new Vector2(-radius, areaSize/2f);
                 velocity = new Vector2(speed, 0);
                 break;

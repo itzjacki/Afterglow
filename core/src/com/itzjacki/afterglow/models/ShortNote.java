@@ -28,42 +28,34 @@ public class ShortNote implements Note {
 
         switch (state) {
             case 0:
-                System.out.println("N: Bullet spawned.");
                 position = new Vector2(areaSize/2f, areaSize + radius);
                 velocity = new Vector2(0, -speed);
                 break;
             case 1:
-                System.out.println("NE: Bullet spawned");
                 position = new Vector2(areaSize + radius, areaSize + radius);
                 velocity = new Vector2(-speed, -speed);
                 break;
             case 2:
-                System.out.println("E: Bullet spawned");
                 position = new Vector2(areaSize + radius, areaSize/2f);
                 velocity = new Vector2(-speed, 0);
                 break;
             case 3:
-                System.out.println("SE: Bullet spawned");
                 position = new Vector2(areaSize + radius, -radius);
                 velocity = new Vector2(-speed, speed);
                 break;
             case 4:
-                System.out.println("S: Bullet spawned");
                 position = new Vector2(areaSize/2f, -radius);
                 velocity = new Vector2(0, speed);
                 break;
             case 5:
-                System.out.println("SW: Bullet spawned");
                 position = new Vector2(-radius, -radius);
                 velocity = new Vector2(speed, speed);
                 break;
             case 6:
-                System.out.println("W: Bullet spawned");
                 position = new Vector2(-radius, areaSize/2f);
                 velocity = new Vector2(speed, 0);
                 break;
             case 7:
-                System.out.println("NW: Bullet spawned");
                 position = new Vector2( -radius, areaSize + radius);
                 velocity = new Vector2(speed, -speed);
                 break;

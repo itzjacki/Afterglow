@@ -16,7 +16,6 @@ public class CircleNote implements Note{
         this.areaSize = areaSize;
         threshold = wedgeOrbRadius;
 
-        System.out.println("Circle note spawned");
         velocity = - (AfterglowGame.ACTIVE_PLAY_SIZE - wedgeOrbRadius) / 2f / (timeAlive / 1000);
         size = areaSize/2f/(float)(Math.sin(Math.PI/4));
     }

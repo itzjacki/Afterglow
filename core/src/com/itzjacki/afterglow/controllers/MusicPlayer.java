@@ -14,8 +14,6 @@ public class MusicPlayer {
         music = Gdx.audio.newMusic(song.getMusicFile());
         music.setVolume(EventManager.getInstance().getMusicVolume() * song.getBaseVolume());
         music.play();
-        System.out.println("Looping: " + music.isLooping());
-        System.out.println("Playing: " + music.isPlaying());
     }
 
     public float getPlaybackTime(){

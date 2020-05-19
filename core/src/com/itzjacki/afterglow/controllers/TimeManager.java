@@ -49,8 +49,7 @@ public class TimeManager {
 
         // Will keep fetching new notes until there are no more that are overdue at the current time stamp.
         // Notes are spawned a certain time "timeAlive" before they're due to hit the centre, which is given by "time".
-        while(!noteList.isEmpty() && noteList.get(0)[0] <= time * 1000){
-            System.out.println("TIME COMPARISON: " + (noteList.get(0)[0] - noteList.get(0)[4]) + " must be bigger than " + (time * 1000));
+        while(!noteList.isEmpty() && noteList.get(0)[0] - timeToCenter <= time * 1000){
             int[] note = noteList.remove(0);
             int type = note[1];
             int state = note[2];

@@ -198,7 +198,10 @@ public class PlayScreen implements Screen {
     }
 
     private void debugTimeDelta(){
-        System.out.println("Game time: " + timeManager.getTime() + ", song time: " + musicPlayer.getPlaybackTime() + ", Delta: " + (timeManager.getTime() - musicPlayer.getPlaybackTime()));
+        System.out.println("Game time: " + timeManager.getTime() + ", song time: " + musicPlayer.getPlaybackTime() +
+                ", Delta: " + (timeManager.getTime() - musicPlayer.getPlaybackTime()) +
+                ", Relative delta (music timer): " + (timeManager.getTime() - musicPlayer.getPlaybackTime())/musicPlayer.getPlaybackTime() +
+                ", Relative delta (game timer): " + (timeManager.getTime() - musicPlayer.getPlaybackTime())/timeManager.getTime());
     }
 
 
