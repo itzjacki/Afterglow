@@ -70,10 +70,13 @@ public class PlayScreen implements Screen {
     public PlayScreen(Song song) {
         this.song = song;
 
+        //TODO: Remove, testing purposes only
+        new Song("Grandma (Destruction)");
+
         musicPlayer = new MusicPlayer(song);
 
         // Colors are given in RGBA in hex format
-        // These should all be loaded in automatically from the song file.
+        // TODO: These should all be loaded in automatically from the song file.
         playerWedgeColor = new Color(Color.valueOf("211d14ff"));
         playerCircleColor = new Color(Color.valueOf("f7f6edff"));
         backgroundColor = new Color(Color.valueOf("b5b49eff"));

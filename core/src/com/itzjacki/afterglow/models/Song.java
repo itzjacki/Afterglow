@@ -9,7 +9,7 @@ import java.util.List;
 
 public class Song {
 
-    private String name;
+    private String directoryName;
 
     // These might not be necessary to keep saved here, since PlayScreen also has them. Might be better to get them via a method from this class.
     private Color playerWedgeColor;
@@ -30,9 +30,19 @@ public class Song {
 
     private List<int[]> noteList;
 
-    public Song(){
-        // TODO: Make these load dynamically from song's info file. These details are used for testing purposes only.
-        this.name = "Grandma (Destruction)";
+    public Song(String directoryName) {
+        this.directoryName = directoryName;
+        String rawString = readSongInfo();
+        String[] basicTrim = rawString.split("}");
+        for(String s : basicTrim){
+            s = s.trim();
+        }
+    }
+
+    // TODO: This constructor should be completely replaced by one that dynamically loads everything from directoryname
+    // This constructor is only used during development. Remove.
+    public Song() {
+        this.directoryName = "Grandma (Destruction)";
         this.baseVolume = 0.5f;
         this.defaultTimeAlive = 600;
         this.noteList = new ArrayList<>();
@@ -162,19 +172,24 @@ public class Song {
 
     }
 
-    public float getBaseVolume(){
+    private String readSongInfo() {
+        FileHandle infoFile = Gdx.files.local(getFileDirectory()+"song_map.txt");
+        return infoFile.readString();
+    }
+
+    public float getBaseVolume() {
         return baseVolume;
     }
 
-    public String getFileDirectory(){
-        return "songs/" + name + "/";
+    public String getFileDirectory() {
+        return "songs/" + directoryName + "/";
     }
 
-    public FileHandle getMusicFile(){
+    public FileHandle getMusicFile() {
         return Gdx.files.internal(getFileDirectory() + "music.mp3");
     }
 
-    public float getDefaultTimeAlive(){
+    public float getDefaultTimeAlive() {
         return defaultTimeAlive;
     }
 
