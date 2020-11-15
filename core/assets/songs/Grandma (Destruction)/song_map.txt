@@ -1,16 +1,16 @@
 baseInfo{
-    name="Grandma (Destruction)";
-    baseVolume="0.5";
-    defaultTimeAlive="600";
+    name='Grandma (Destruction)'
+    baseVolume='0.5'
+    defaultTimeAlive='600'
 }
 
 defaultTheme{
-    playerWedge="211d14ff";
-    playerCircle="f7f6edff";
-    background="b5b49eff";
-    textColor="211d14ff";
-    noteColor="211d14ff";
-    frameColor="f7f6edff";
+    playerWedge='211d14ff'
+    playerCircle='f7f6edff'
+    background='b5b49eff'
+    textColor='211d14ff'
+    noteColor='211d14ff'
+    frameColor='f7f6edff'
 }
 
 bullets{

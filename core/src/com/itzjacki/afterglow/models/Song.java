@@ -5,11 +5,14 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Song {
 
+    // Will probably often be the same in practice, but this allows for different values if needed.
     private String directoryName;
+    private String name;
 
     // These might not be necessary to keep saved here, since PlayScreen also has them. Might be better to get them via a method from this class.
     private Color playerWedgeColor;
@@ -33,13 +36,13 @@ public class Song {
     public Song(String directoryName) {
         this.directoryName = directoryName;
         String rawString = readSongInfo();
-        String[] basicTrim = rawString.split("}");
-        for(String s : basicTrim){
-            s = s.trim();
+        String[] basicTrim = splitAndTrim(rawString, "}");
+        for (String s : basicTrim) {
+            setBaseInfo(s, "baseInfo{");
         }
     }
 
-    // TODO: This constructor should be completely replaced by one that dynamically loads everything from directoryname
+    // TODO: This constructor should be completely replaced by one that dynamically loads everything from directoryName
     // This constructor is only used during development. Remove.
     public Song() {
         this.directoryName = "Grandma (Destruction)";
@@ -173,8 +176,42 @@ public class Song {
     }
 
     private String readSongInfo() {
-        FileHandle infoFile = Gdx.files.local(getFileDirectory()+"song_map.txt");
+        FileHandle infoFile = Gdx.files.local(getFileDirectory() + "song_map.txt");
         return infoFile.readString();
+    }
+
+    private String[] splitAndTrim(String input, String splitDivider){
+        String[] splitString = input.split(splitDivider);
+        String[] result = splitString.clone();
+        for (int i = 0; i < splitString.length; i++){
+            result[i] = splitString[i].trim();
+        }
+        return result;
+    }
+
+    private void setBaseInfo(String inputString, String sectionKey){
+        if (inputString.startsWith(sectionKey)){
+            String trimmedString = inputString.substring(sectionKey.length());
+            String[] infoArray = splitAndTrim(trimmedString, "'");
+            this.name = getNextAfterMatch(infoArray, "name=");
+            this.baseVolume = Float.parseFloat(getNextAfterMatch(infoArray, "baseVolume="));
+            this.defaultTimeAlive = Integer.parseInt(getNextAfterMatch(infoArray, "defaultTimeAlive="));
+        }
+    }
+
+    // Returns the element that comes next in the list after the one that matches
+    private String getNextAfterMatch(String[] configArray, String configKey){
+        boolean returnNext = false;
+        for (String s : configArray){
+            if (returnNext){
+                return s;
+            }
+            if (s.equals(configKey)) {
+                returnNext = true;
+            }
+        }
+        // TODO: This should probably be replaced with an actual error system lol
+        return "key not found";
     }
 
     public float getBaseVolume() {
