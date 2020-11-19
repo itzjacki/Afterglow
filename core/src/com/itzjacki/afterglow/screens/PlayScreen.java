@@ -71,18 +71,18 @@ public class PlayScreen implements Screen {
         this.song = song;
 
         //TODO: Remove, testing purposes only
-        new Song("Grandma (Destruction)");
+        new Song("Grandma (Destruction)", this);
 
         musicPlayer = new MusicPlayer(song);
 
         // Colors are given in RGBA in hex format
         // TODO: These should all be loaded in automatically from the song file.
-        playerWedgeColor = new Color(Color.valueOf("211d14ff"));
-        playerCircleColor = new Color(Color.valueOf("f7f6edff"));
-        backgroundColor = new Color(Color.valueOf("b5b49eff"));
-        textColor =  new Color(Color.valueOf("211d14ff"));
-        noteColor =  new Color(Color.valueOf("211d14ff"));
-        frameColor =  new Color(Color.valueOf("f7f6edff"));
+//        playerWedgeColor = new Color(Color.valueOf("211d14ff"));
+//        playerCircleColor = new Color(Color.valueOf("f7f6edff"));
+//        backgroundColor = new Color(Color.valueOf("b5b49eff"));
+//        textColor =  new Color(Color.valueOf("211d14ff"));
+//        noteColor =  new Color(Color.valueOf("211d14ff"));
+//        frameColor =  new Color(Color.valueOf("f7f6edff"));
 
         playWorldSize = AfterglowGame.ACTIVE_PLAY_SIZE;
         gameCamera = new OrthographicCamera();

@@ -3,24 +3,22 @@ package com.itzjacki.afterglow.models;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.itzjacki.afterglow.screens.PlayScreen;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Song {
+    // Triggers if a necessary config field doesn't exist. Makes the song non-selectable from the menu.
+    // TODO: Ensure that there are default values everywhere it makes sense
+    // TODO: Make sure song is displayed as erroneous and can't be played
+    private boolean hasConfigError = false;
 
     // Will probably often be the same in practice, but this allows for different values if needed.
     private String directoryName;
     private String name;
 
-    // These might not be necessary to keep saved here, since PlayScreen also has them. Might be better to get them via a method from this class.
-    private Color playerWedgeColor;
-    private Color playerCircleColor;
-    private Color backgroundColor;
-    private Color textColor;
-    private Color noteColor;
-    private Color frameColor;
+    private PlayScreen screen;
 
     // A song's individual base volume. To help adjust song files which are too loud or quiet.
     // Is multiplied with user's volume choice. 0.5 is default value.
@@ -33,12 +31,16 @@ public class Song {
 
     private List<int[]> noteList;
 
-    public Song(String directoryName) {
+    public Song(String directoryName, PlayScreen screen) {
         this.directoryName = directoryName;
-        String rawString = readSongInfo();
+
+        this.screen = screen;
+
+        String rawString = readInfoFile();
         String[] basicTrim = splitAndTrim(rawString, "}");
         for (String s : basicTrim) {
-            setBaseInfo(s, "baseInfo{");
+            setBaseInfo(s);
+            setDefaultTheme(s);
         }
     }
 
@@ -175,43 +177,65 @@ public class Song {
 
     }
 
-    private String readSongInfo() {
+    private String readInfoFile() {
         FileHandle infoFile = Gdx.files.local(getFileDirectory() + "song_map.txt");
         return infoFile.readString();
     }
 
-    private String[] splitAndTrim(String input, String splitDivider){
+    // Helper method that splits a String on a character, then trims all items in the resulting array
+    private String[] splitAndTrim(String input, String splitDivider) {
         String[] splitString = input.split(splitDivider);
         String[] result = splitString.clone();
-        for (int i = 0; i < splitString.length; i++){
+        for (int i = 0; i < splitString.length; i++) {
             result[i] = splitString[i].trim();
         }
         return result;
     }
 
-    private void setBaseInfo(String inputString, String sectionKey){
-        if (inputString.startsWith(sectionKey)){
-            String trimmedString = inputString.substring(sectionKey.length());
-            String[] infoArray = splitAndTrim(trimmedString, "'");
-            this.name = getNextAfterMatch(infoArray, "name=");
-            this.baseVolume = Float.parseFloat(getNextAfterMatch(infoArray, "baseVolume="));
-            this.defaultTimeAlive = Integer.parseInt(getNextAfterMatch(infoArray, "defaultTimeAlive="));
+    // Reads the value of a color and returns it as a Color object
+    private Color colorFromConfigString(String[] configArray, String configKey){
+        return new Color(Color.valueOf(getNextAfterMatch(configArray, configKey)));
+    }
+
+    // Sets basic info of song on creation
+    private void setBaseInfo(String inputString) {
+        if (inputString.startsWith("baseInfo{")) {
+            String trimmedString = inputString.substring("baseInfo{".length());
+            String[] configArray = splitAndTrim(trimmedString, "'");
+            this.name = getNextAfterMatch(configArray, "name=");
+            this.baseVolume = Float.parseFloat(getNextAfterMatch(configArray, "baseVolume="));
+            this.defaultTimeAlive = Integer.parseInt(getNextAfterMatch(configArray, "defaultTimeAlive="));
+        }
+    }
+
+    // Sets visual theme info of song on creation (does not handle visual events, only used on creation of Song)
+    private void setDefaultTheme(String inputString) {
+        if (inputString.startsWith("defaultTheme{")) {
+            String trimmedString = inputString.substring("defaultTheme{".length());
+            String[] configArray = splitAndTrim(trimmedString, "'");
+            // Colors are given in RGBA hex format.
+            this.screen.setPlayerWedgeColor(colorFromConfigString(configArray, "playerWedge="));
+            this.screen.setPlayerCircleColor(colorFromConfigString(configArray, "playerCircle="));
+            this.screen.setBackgroundColor(colorFromConfigString(configArray, "background="));
+            this.screen.setTextColor(colorFromConfigString(configArray, "textColor="));
+            this.screen.setNoteColor(colorFromConfigString(configArray, "noteColor="));
+            this.screen.setFrameColor(colorFromConfigString(configArray, "frameColor="));
         }
     }
 
     // Returns the element that comes next in the list after the one that matches
-    private String getNextAfterMatch(String[] configArray, String configKey){
+    private String getNextAfterMatch(String[] configArray, String configKey) {
         boolean returnNext = false;
-        for (String s : configArray){
-            if (returnNext){
+        for (String s : configArray) {
+            if (returnNext) {
                 return s;
             }
             if (s.equals(configKey)) {
                 returnNext = true;
             }
         }
-        // TODO: This should probably be replaced with an actual error system lol
-        return "key not found";
+        hasConfigError = true;
+        return "";
     }
 
     public float getBaseVolume() {
