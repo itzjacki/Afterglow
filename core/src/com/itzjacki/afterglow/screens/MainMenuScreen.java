@@ -50,17 +50,18 @@ public class MainMenuScreen implements Screen {
         stage.addActor(menuTable);
 
         // Adds listeners to the UI
+        playButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                //TODO: This button should lead to song list. Currently starts a song instance for development purposes.
+                EventManager.getInstance().createSongInstance(AfterglowGame.songs.get(0));
+            }
+        });
+
         optionsButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 EventManager.getInstance().changeScreen("Options");
-            }
-        });
-
-        playButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                EventManager.getInstance().changeScreen("Play");
             }
         });
 
@@ -82,6 +83,8 @@ public class MainMenuScreen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
+
+        menuViewport.apply();
     }
 
     @Override

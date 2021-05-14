@@ -11,6 +11,7 @@ public class DesktopLauncher {
 		config.resizable = false;
 		config.width = 1600; // Default size before configured by user
 		config.height = 900;
+		config.samples = 8;
 		new LwjglApplication(new AfterglowGame(), config);
 	}
 }

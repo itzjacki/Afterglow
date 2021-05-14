@@ -2,11 +2,11 @@ package com.itzjacki.afterglow.controllers;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.math.Interpolation;
 import com.itzjacki.afterglow.AfterglowGame;
+import com.itzjacki.afterglow.models.Song;
 import com.itzjacki.afterglow.screens.MainMenuScreen;
-import com.itzjacki.afterglow.screens.OptionsScreen;
 import com.itzjacki.afterglow.screens.PlayScreen;
 
 public class EventManager {
@@ -14,6 +14,8 @@ public class EventManager {
     // EventManager is a singleton
     private static final EventManager INSTANCE = new EventManager();
     private PlayerOptionManager pom;
+    // im will hold the currently active instance manager when a song is being played.
+    private PlayScreen songInstance;
 
     private EventManager(){
         pom = new PlayerOptionManager();
@@ -23,10 +25,39 @@ public class EventManager {
         return INSTANCE;
     }
 
-    // Uses the LibGDX screen system to change the active screen
+    // Takes in wedge state (int 0-8) and returns true if the arrow(s) corresponding to the state is being pressed.
+    // Also works with the space bar for the circle state (state 8).
+    // Is also used by the player wedge when it's drawn, and doesn't do anything dynamic. Therefore static and public.
+    public boolean isArrowPressed(int state){
+        switch (state){
+            case 0:
+                return Gdx.input.isKeyPressed(Input.Keys.UP);
+            case 1:
+                return Gdx.input.isKeyPressed(Input.Keys.UP) && Gdx.input.isKeyPressed(Input.Keys.RIGHT);
+            case 2:
+                return Gdx.input.isKeyPressed(Input.Keys.RIGHT);
+            case 3:
+                return Gdx.input.isKeyPressed(Input.Keys.DOWN) && Gdx.input.isKeyPressed(Input.Keys.RIGHT);
+            case 4:
+                return Gdx.input.isKeyPressed(Input.Keys.DOWN);
+            case 5:
+                return Gdx.input.isKeyPressed(Input.Keys.DOWN) && Gdx.input.isKeyPressed(Input.Keys.LEFT);
+            case 6:
+                return Gdx.input.isKeyPressed(Input.Keys.LEFT);
+            case 7:
+                return Gdx.input.isKeyPressed(Input.Keys.UP) && Gdx.input.isKeyPressed(Input.Keys.LEFT);
+            case 8:
+                return Gdx.input.isKeyPressed(Input.Keys.SPACE);
+            default:
+                throw new IllegalArgumentException("Couldn't check for wedge state " + state + " because it does not exist.");
+        }
+    }
+
+    // Finds screen among the game's default screens
     public void changeScreen(String screenName){
-        if(screenName == "Loading"){
-            ((Game) Gdx.app.getApplicationListener()).setScreen(AfterglowGame.loadingScreen);
+        if(screenName.equals("Loading")){
+            changeScreen(AfterglowGame.loadingScreen);
+            System.out.println("Changed to loading screen");
         }
         else {
             Screen chosenScreen = AfterglowGame.screens.get(screenName);
@@ -34,9 +65,33 @@ public class EventManager {
                 System.out.println("Tried to go to screen which doesn't exist: " + screenName); // To be used during development. Less severe.
                 // throw new IllegalArgumentException("Tried to go to screen which doesn't exist: " + screenName);
             }
-            ((Game) Gdx.app.getApplicationListener()).setScreen(chosenScreen);
-            System.out.println("Changed to screen: " + screenName); // for debugging
+            else{
+                changeScreen(chosenScreen);
+                System.out.println("Changed to screen: " + screenName); // for debugging
+            }
         }
+    }
+    // Changes to screen explicitly passed in parameter
+    public void changeScreen(Screen screen){
+        ((Game) Gdx.app.getApplicationListener()).setScreen(screen);
+    }
+
+    public void createSongInstance(Song song){
+        songInstance = new PlayScreen(song);
+        changeScreen(songInstance);
+    }
+
+    public void endSongInstance(boolean songWasBeaten, int finalScore, int highestCombo){
+        System.out.println("Song ended");
+        changeScreen("MainMenu");
+        songInstance.dispose();
+        songInstance = null;
+        // TODO: Save if high score. Prompt to upload to online high scores. Send to end screen.
+    }
+
+    public float getScoreModifier(){
+        // TODO: Implement modifier system with modifier screen. This method should return what the score modifier is based on which modifiers are active. (ie. 0x with invincibility active)
+        return 1f;
     }
 
     public void saveAndApplyPreferences(){
