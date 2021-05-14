@@ -26,16 +26,16 @@ public class Song {
     private float baseVolume;
 
     // The time it takes for a bullet to spawn until it hits the middle in milliseconds.
-    // Lower time alive means higher speed. A good default value is 600 ms.
+    // Lower time alive means higher speed. A good default value is 600 ms. Must be integer.
     private float defaultTimeAlive;
 
     private List<int[]> noteList;
 
     public Song(String directoryName, PlayScreen screen) {
         this.directoryName = directoryName;
-
         this.screen = screen;
 
+        // Gets config text, splits by category, and applies settings accordingly
         String rawString = readInfoFile();
         String[] basicTrim = splitAndTrim(rawString, "}");
         for (String s : basicTrim) {
@@ -199,8 +199,9 @@ public class Song {
 
     // Sets basic info of song on creation
     private void setBaseInfo(String inputString) {
-        if (inputString.startsWith("baseInfo{")) {
-            String trimmedString = inputString.substring("baseInfo{".length());
+        final String categoryName = "baseInfo{";
+        if (inputString.startsWith(categoryName)) {
+            String trimmedString = inputString.substring(categoryName.length());
             String[] configArray = splitAndTrim(trimmedString, "'");
             this.name = getNextAfterMatch(configArray, "name=");
             this.baseVolume = Float.parseFloat(getNextAfterMatch(configArray, "baseVolume="));
@@ -210,8 +211,9 @@ public class Song {
 
     // Sets visual theme info of song on creation (does not handle visual events, only used on creation of Song)
     private void setDefaultTheme(String inputString) {
-        if (inputString.startsWith("defaultTheme{")) {
-            String trimmedString = inputString.substring("defaultTheme{".length());
+        final String categoryName = "defaultTheme{";
+        if (inputString.startsWith(categoryName)) {
+            String trimmedString = inputString.substring(categoryName.length());
             String[] configArray = splitAndTrim(trimmedString, "'");
             // Colors are given in RGBA hex format.
             this.screen.setPlayerWedgeColor(colorFromConfigString(configArray, "playerWedge="));
