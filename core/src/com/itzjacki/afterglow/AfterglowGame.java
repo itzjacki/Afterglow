@@ -68,6 +68,6 @@ public class AfterglowGame extends Game {
 	// Loads into "songs" automatically from files found in the relevant directory
 	private static void loadSongs() {
 		//TODO: Implement
-		songs.add(new Song());
+		songs.add(new Song("Grandma (Destruction)"));
 	}
 }
