@@ -5,7 +5,7 @@ This is the repository for my 2020 ground-up remake of the hit rhythm game After
 
 As of September 2020, other projects have taken precendence, so progress has been slow since I started in May. There is, however, a playable super-early demo available which shows of the core mechanics. About 90 seconds of playable song has been mapped in the demo.
 
-Demo download: https://drive.google.com/file/d/1jo1kQIIfoOB8UMfF1aaNoJC1yJkCt3d6/view?usp=sharing
+Demo download: https://drive.google.com/file/d/1NdA6j2eGxcwZPQ0DpnT9FIbz-lWxjrSw/view?usp=sharing
 
 Thanks for checking it out!
 
